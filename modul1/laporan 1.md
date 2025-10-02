@@ -9,18 +9,128 @@ Input dari pengguna dapat diterima menggunakan perintah cin, sedangkan hasil per
 
 ## Guided 
 
-### 1. [Nama Topik]
+### 1. Hello World
 
 ```C++
 #include <iostream>
 using namespace std;
 
 int main() {
-    cout << "ini adalah file code guided praktikan" << endl;
+    cout << "Hello, World" << endl;
     return 0;
 }
 ```
-Kode di atas digunakan untuk mencetak teks "ini adalah file code guided praktikan" ke layar menggunakan function cout untuk mengeksekusi nya.
+Kode di atas digunakan untuk mencetak teks "Hello, World" ke layar menggunakan function cout untuk mengeksekusi nya.
+
+### 2. Input Output
+
+```C++
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    const float pi = 3.14;
+
+    cout << "Masukan angka: ";
+    cin >> n ;
+
+    cout << "Angka dikeluarkan: " << n << endl;
+    cout << "Nilai konstanta pi: " << pi << endl;
+
+    return 0;
+
+}
+```
+Kode di atas digunakan untuk membaca input angka dari pengguna, kemudian mencetak kembali angka tersebut serta menampilkan nilai konstanta pi yang telah didefinisikan.
+
+### 3. Operato Logika
+
+```C++
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a;
+    int b;
+
+    cout << "Masukan angka1: ";
+    cin >> a;
+    cout << "Masukan angka2: ";
+    cin >> b;
+
+    //operator aritmatika
+    cout << "a + b = " << (a+b) << endl;
+    cout << "a - b = " << (a-b) << endl;
+    cout << "a * b = " << (a*b) << endl;
+    cout << "a / b = " << (a/b) << endl;
+    cout << "a % b = " << (a%b) << endl;
+
+    //operator logika
+    cout << "a > b = " << (a>b) << endl;
+    cout << "a < b = " << (a<b) << endl;
+    cout << "a >= b = " << (a>=b) << endl;
+    cout << "a <= b = " << (a<=b) << endl;
+    cout << "a == b = " << (a==b) << endl;
+    cout << "a != b = " << (a!=b) << endl;
+
+    return 0;
+}
+```
+Kode di atas digunakan untuk menerima dua input bilangan dari pengguna, kemudian menampilkan hasil operasi aritmatika (penjumlahan, pengurangan, perkalian, pembagian, dan modulus) serta operasi logika/perbandingan (>, <, >=, <=, ==, !=) antara kedua bilangan tersebut.
+
+### 4. Percabangan
+
+```C++
+#include <iostream>
+using namespace std;
+
+int main() {
+    int angka1 = 10;
+    int angka2 = 20;
+
+    if (angka1 > angka2) {
+        cout << "Angka1 lebih besar dari Angka2" << endl;
+    } else if (angka1 < angka2) {
+        cout << "Angka1 lebih kecil dari Angka2" << endl;
+    } else {
+        cout << "Angka1 sama dengan Angka2" << endl;
+    }
+
+    return 0;
+}
+```
+Kode di atas melambangkan implementasi percabangan (if–else) dalam C++, di mana program membandingkan dua bilangan dan menentukan kondisi yang sesuai untuk ditampilkan ke layar.
+
+### 5.Perulangan(for)
+
+```C++
+Perulangan(For)
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int i;
+    int j;
+
+    for (int i = 0; i <= 10; i++) {
+        cout << i << "-" ;
+    }
+
+    cout << endl;
+
+    for (int j = 20; j >= 10; j--) {
+        cout << j << "-";
+    }
+
+    return 0;
+    
+}
+```
+Kode di atas digunakan untuk membaca input angka dari pengguna, kemudian mencetak kembali angka tersebut serta menampilkan nilai konstanta pi yang telah didefinisikan.
+
+
 
 ## Unguided 
 
