@@ -26,15 +26,29 @@ Kode di atas digunakan untuk mencetak teks "ini adalah file code guided praktika
 
 ```C++
 #include <iostream>
+
 using namespace std;
 
-int main() {
-    cout << "ini adalah file code unguided praktikan" << endl;
+int main(){
+    int a;
+    int b;
+
+    cout << "Masukan Angka Pertama : ";
+    cin >> a;
+    cout << "Masukan Angka Kedua : ";
+    cin >> b;
+
+    cout << "a + b =" << (a+b) << endl;
+    cout << "a - b =" << (a-b) << endl;
+    cout << "a * b =" << (a*b) << endl;
+    cout << "a / b =" << (a/b) << endl;
+
     return 0;
+    
 }
 ```
 #### Output:
-![240302_00h00m06s_screenshot](https://github.com/suxeno/Struktur-Data-Assignment/assets/111122086/6d1727a8-fb77-4ecf-81ff-5de9386686b7)
+<img width="1153" height="199" alt="Image" src="https://github.com/user-attachments/assets/5072f0a1-a405-441e-859d-511f99f4d3c1" />
 
 Kode di atas digunakan untuk mencetak teks "ini adalah file code guided praktikan" ke layar menggunakan function cout untuk mengeksekusi nya.
 
