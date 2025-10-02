@@ -52,6 +52,9 @@ int main(){
 
 Kode di atas digunakan untuk mencetak teks "ini adalah file code guided praktikan" ke layar menggunakan function cout untuk mengeksekusi nya.
 
+### Output :
+![Image](https://github.com/user-attachments/assets/d6b0034d-5a7f-43eb-801a-a67602dd7104)
+
 #### Full code Screenshot:
 ![240309_10h21m35s_screenshot](https://github.com/suxeno/Struktur-Data-Assignment/assets/111122086/41e9641c-ad4e-4e50-9ca4-a0215e336b04)
 
