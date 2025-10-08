@@ -1,4 +1,4 @@
-# <h1 align="center">Laporan Praktikum Modul Pengenalan Bahasa C++ 2>
+# <h1 align="center">Laporan Praktikum Modul Pengenalan Bahasa C++ Modul 2
 <p align="center">Nofia Dewi Fitriana  </p>
 
 ## Dasar Teori
