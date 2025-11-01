@@ -229,7 +229,7 @@ void insertLast(linkedlist &List, address nodeBaru);
 #endif
 ```
 
-### 4. main2.cpp
+### main2.cpp
 
 ```C++
 #include "list2.h"
@@ -480,226 +480,334 @@ void deleteList(linkedlist &List){
 
 ## Unguided 
 
-### 1. Array
-<img width="794" height="63" alt="Cuplikan layar 2025-10-08 223818" src="https://github.com/user-attachments/assets/7ee24b30-6b7d-4389-bd8a-dc48870dcb65" />
+<img width="740" height="341" alt="image" src="https://github.com/user-attachments/assets/fbb6a37a-f65d-46b9-9bbd-1e01c7a6c34d" />
+
+### singlylist.h
 
 ```C++
+#ifndef SINGLYLIST_H
+#define SINGLYLIST_H
+
 #include <iostream>
 using namespace std;
 
-int main(){
-    int i,j,k;
-    int A[3][3], B[3][3], C[3][3];
-    int pilihan;
+typedef int infotype;
 
-    cout << "\nMasukan elemen matriks A (3x3):\n";
-    for ( i = 0; i < 3; i++){
-        for (j = 0; j < 3; j++){
-            cout << 
-            "A[" << i << i + 1 << "][" << j + 1 << "] = ";
-            cin >> A[i][j];
-        }
-        
-    }
-    cout << "\nMasukan elemen matriks B (3x3) :\n";
-    for ( i = 0; i < 3; i++) {
-        for (j = 0; j < 3; j++){
-            cout << "B[" << i + 1 << "][" << j + 1 << "] = ";
-             cin >> B[i][j];       
-        }
-    }
-    
-    cout << "\nPilih operasi:\n";
-    cout << "1. Penjumlahan\n";
-    cout << "2. Pengurangan\n";
-    cout << "3. Perkalian\n";
-    cout << "Pilihan Anda: ";
-    cin >> pilihan;
+struct ElmList {
+    infotype info;
+    ElmList* next;
+};
 
-    switch (pilihan) {
-        case 1:
-            for (i = 0; i < 3; i++)
-                for (j = 0; j < 3; j++)
-                    C[i][j] = A[i][j] + B[i][j];
-            cout << "\nHasil Penjumlahan Matriks (A + B):\n";
-            break;
+typedef ElmList* address;
 
-        case 2:
-            for (i = 0; i < 3; i++)
-                for (j = 0; j < 3; j++)
-                    C[i][j] = A[i][j] - B[i][j];
-            cout << "\nHasil Pengurangan Matriks (A - B):\n";
-            break;
+struct List {
+    address first;
+};
 
-        case 3:
-            for (i = 0; i < 3; i++) {
-                for (j = 0; j < 3; j++) {
-                    C[i][j] = 0;
-                    for (k = 0; k < 3; k++) {
-                        C[i][j] += A[i][k] * B[k][j];
-                    }
-                }
-            }
-            cout << "\nHasil Perkalian Matriks (A x B):\n";
-            break;
+// Prototype
+void createList(List &L);
+address alokasi(infotype x);
+void dealokasi(address &P);
+void insertFirst(List &L, address P);
+void printInfo(List L);
 
-        default:
-            cout << "Pilihan tidak valid!\n";
-            return 0;
-    }
-
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < 3; j++) {
-            cout << C[i][j] << "\t";
-        }
-        cout << endl;
-    }
-
-    return 0;
-}
+#endif
 
 ```
-#### Output:
-<img width="1291" height="711" alt="Cuplikan layar 2025-10-08 224314" src="https://github.com/user-attachments/assets/df5578d8-e733-4299-9ddc-b5ac2da5723c" />
-
-Kode tersebut digunakan untuk melakukan operasi aritmetika pada dua matriks berordo 3x3, yaitu penjumlahan, pengurangan, atau perkalian, sesuai pilihan pengguna.
-#### Full code Screenshot:
-<img width="1759" height="930" alt="Cuplikan layar 2025-10-08 230114" src="https://github.com/user-attachments/assets/a4cac099-05d9-460c-a287-7840105ae09d" />
-
-### 2. Pointer
-<img width="771" height="58" alt="Cuplikan layar 2025-10-08 224520" src="https://github.com/user-attachments/assets/0070adfd-77f7-4e88-97b0-f4e01e4ac117" />
+### singlylist.cpp
 
 ```C++
-#include <iostream>
-using namespace std;
+#include "singlylist.h"
 
-void tukar3(int *x,int *y, int *z){
-    int temp;
-    temp = *x;
-    *x = *y;
-    *y = *z;
-    *z = temp;
+void createList(List &L) {
+    L.first = NULL;
 }
 
-int main(){
-    int a = 10, b=20, c=30;
+address alokasi(infotype x) {
+    address P = new ElmList;
+    P->info = x;
+    P->next = NULL;
+    return P;
+}
 
-    cout << "Sebelum ditukar :\n";
-    cout << "a = " << a << "b = " << b << "c = " << c << endl;
+void dealokasi(address &P) {
+    delete P;
+    P = NULL;
+}
 
-    tukar3(&a, &b,&c);
+void insertFirst(List &L, address P) {
+    if (L.first == NULL) {
+        L.first = P;
+    } else {
+        P->next = L.first;
+        L.first = P;
+    }
+}
 
-    cout << "Setelah Ditukar :\n";
-    cout << "a = " << a << ", b = " << b << ", c = " << c << endl;
-
-    return 0;
+void printInfo(List L) {
+    address P = L.first;
+    while (P != NULL) {
+        cout << P->info << " ";
+        P = P->next;
+    }
+    cout << endl;
 }
 ```
-#### Output:
-<img width="1220" height="134" alt="Cuplikan layar 2025-10-08 224645" src="https://github.com/user-attachments/assets/feb342f5-b15b-4e3a-8edf-3e6d74d68c06" />
 
-Kode tersebut digunakan untuk menukar nilai tiga variabel (a, b, dan c) secara bergantian menggunakan pointer. Setelah fungsi tukar3 dijalankan, nilai a menjadi nilai b, b menjadi c, dan c menjadi a.
-
-#### Full code Screenshot:
-<img width="1759" height="926" alt="Cuplikan layar 2025-10-08 224658" src="https://github.com/user-attachments/assets/014dd419-4dee-4b27-a375-492164b3afe0" />
-
-
-### 3. Array
-<img width="819" height="370" alt="image" src="https://github.com/user-attachments/assets/fd5352d6-4f5a-4331-97bc-3faa2cfc57f8" />
+### singlymain.cpp
 
 ```C++
-#include <iostream>
-using namespace std;
-
-int cariMinimum(int arr[], int n) {
-    int min = arr[0];
-    for (int i = 1; i < n; i++) {
-        if (arr[i] < min)
-            min = arr[i];
-    }
-    return min;
-}
-
-int cariMaksimum(int arr[], int n) {
-    int max = arr[0];
-    for (int i = 1; i < n; i++) {
-        if (arr[i] > max)
-            max = arr[i];
-    }
-    return max;
-}
-
-void hitungRataRata(int arr[], int n) {
-    float total = 0;
-    for (int i = 0; i < n; i++) {
-        total += arr[i];
-    }
-    float rata = total / n;
-    cout << "Nilai rata-rata = " << rata << endl;
-}
+#include "singlylist.h"
 
 int main() {
-    int arrA[] = {11, 8, 5, 7, 12, 26, 3, 54, 33, 55};
-    int n = sizeof(arrA) / sizeof(arrA[0]);
-    int pilihan;
+    List L;
+    address P1, P2, P3, P4, P5;
 
-    do {
-        cout << "\n--- Menu Program Array ---" << endl;
-        cout << "1. Tampilkan isi array" << endl;
-        cout << "2. Cari nilai maksimum" << endl;
-        cout << "3. Cari nilai minimum" << endl;
-        cout << "4. Hitung nilai rata-rata" << endl;
-        cout << "5. Keluar" << endl;
-        cout << "Pilih menu (1-5): ";
-        cin >> pilihan;
+    createList(L);
 
-        switch (pilihan) {
-            case 1:
-                cout << "Isi array: ";
-                for (int i = 0; i < n; i++) {
-                    cout << arrA[i] << " ";
-                }
-                cout << endl;
-                break;
-            case 2:
-                cout << "Nilai maksimum = " << cariMaksimum(arrA, n) << endl;
-                break;
-            case 3:
-                cout << "Nilai minimum = " << cariMinimum(arrA, n) << endl;
-                break;
-            case 4:
-                hitungRataRata(arrA, n);
-                break;
-            case 5:
-                cout << "Terima kasih!" << endl;
-                break;
-            default:
-                cout << "Pilihan tidak valid!" << endl;
-        }
-    } while (pilihan != 5);
+    P1 = alokasi(2);
+    insertFirst(L, P1);
+
+    P2 = alokasi(0);
+    insertFirst(L, P2);
+
+    P3 = alokasi(8);
+    insertFirst(L, P3);
+
+    P4 = alokasi(12);
+    insertFirst(L, P4);
+
+    P5 = alokasi(9);
+    insertFirst(L, P5);
+
+    printInfo(L);
+
+    return 0;
+}
+
+```
+
+#### Output:
+<img width="1317" height="236" alt="image" src="https://github.com/user-attachments/assets/5ea90e64-84e4-451d-8f0b-13670b510873" />
+
+
+Kode ini menunjukkan cara kerja Singly Linked List dasar:
+
+1. Elemen disimpan dalam node terpisah yang dihubungkan pointer.
+
+2. Penambahan data di awal list menggunakan insertFirst.
+
+3. Traversal dilakukan lewat printInfo.
+
+Bersifat dinamis, artinya ukuran list bisa bertambah tanpa batas selama masih ada memori.
+#### Full code Screenshot:
+<img width="1491" height="773" alt="image" src="https://github.com/user-attachments/assets/363bc936-b5dd-45be-a09e-e129173dba7b" />
+<img width="1485" height="859" alt="image" src="https://github.com/user-attachments/assets/8e3f7ea9-8641-48d6-8fd2-137fc65e5e0f" />
+<img width="1491" height="866" alt="image" src="https://github.com/user-attachments/assets/1b53a9d0-444b-4eb1-a8a5-3d12f0da123e" />
+
+
+
+
+### 2.
+<img width="763" height="264" alt="image" src="https://github.com/user-attachments/assets/7703fc1c-8f6f-4dbb-b751-1491464d3ac9" />
+
+### singlylish.h
+```C++
+#ifndef SINGLYLIST_H
+#define SINGLYLIST_H
+
+#include <iostream>
+using namespace std;
+
+typedef int infotype;
+
+struct ElmList {
+    infotype info;
+    ElmList* next;
+};
+
+typedef ElmList* address;
+
+struct List {
+    address first;
+};
+
+// Prototype
+void createList(List &L);
+address alokasi(infotype x);
+void dealokasi(address &P);
+void insertFirst(List &L, address P);
+void printInfo(List L);
+
+void deleteFirst(List &L, address &P);
+void deleteLast(List &L, address &P);
+void deleteAfter(address Prec, address &P);
+int nbList(List L);
+void deleteList(List &L);
+
+#endif
+
+```
+### singlymain.cpp
+```C++
+#include "singlylist.h"
+
+int main() {
+    List L;
+    address P1, P2, P3, P4, P5, Pdel;
+
+    createList(L);
+
+    P1 = alokasi(2);
+    insertFirst(L, P1);
+
+    P2 = alokasi(0);
+    insertFirst(L, P2);
+
+    P3 = alokasi(8);
+    insertFirst(L, P3);
+
+    P4 = alokasi(12);
+    insertFirst(L, P4);
+
+    P5 = alokasi(9);
+    insertFirst(L, P5);
+
+    // Awal list: 9 -> 12 -> 8 -> 0 -> 2
+    deleteFirst(L, Pdel);   // hapus node 9
+    dealokasi(Pdel);
+
+    deleteLast(L, Pdel);    // hapus node 2
+    dealokasi(Pdel);
+
+    deleteAfter(L.first, Pdel); // hapus node setelah 12 (yaitu 8)
+    dealokasi(Pdel);
+
+    printInfo(L);
+    cout << "Jumlah node : " << nbList(L) << endl;
+
+    deleteList(L);
+    cout << endl << "- List Berhasil Terhapus -" << endl;
+    cout << "Jumlah node : " << nbList(L) << endl;
 
     return 0;
 }
 ```
+### singlylist.cpp
+```C++
+#include "singlylist.h"
+
+void createList(List &L) {
+    L.first = NULL;
+}
+
+address alokasi(infotype x) {
+    address P = new ElmList;
+    P->info = x;
+    P->next = NULL;
+    return P;
+}
+
+void dealokasi(address &P) {
+    delete P;
+    P = NULL;
+}
+
+void insertFirst(List &L, address P) {
+    if (L.first == NULL) {
+        L.first = P;
+    } else {
+        P->next = L.first;
+        L.first = P;
+    }
+}
+
+void printInfo(List L) {
+    address P = L.first;
+    while (P != NULL) {
+        cout << P->info << " ";
+        P = P->next;
+    }
+    cout << endl;
+}
+void deleteFirst(List &L, address &P) {
+    if (L.first != NULL) {
+        P = L.first;
+        L.first = P->next;
+        P->next = NULL;
+    } else {
+        P = NULL;
+    }
+}
+
+void deleteLast(List &L, address &P) {
+    if (L.first == NULL) {
+        P = NULL;
+    } else if (L.first->next == NULL) {
+        P = L.first;
+        L.first = NULL;
+    } else {
+        address Q = L.first;
+        while (Q->next->next != NULL) {
+            Q = Q->next;
+        }
+        P = Q->next;
+        Q->next = NULL;
+    }
+}
+
+void deleteAfter(address Prec, address &P) {
+    if (Prec != NULL && Prec->next != NULL) {
+        P = Prec->next;
+        Prec->next = P->next;
+        P->next = NULL;
+    } else {
+        P = NULL;
+    }
+}
+
+int nbList(List L) {
+    int count = 0;
+    address P = L.first;
+    while (P != NULL) {
+        count++;
+        P = P->next;
+    }
+    return count;
+}
+
+void deleteList(List &L) {
+    address P;
+    while (L.first != NULL) {
+        deleteFirst(L, P);
+        dealokasi(P);
+    }
+}
+
+```
 #### Output:
-<img width="1303" height="788" alt="Cuplikan layar 2025-10-08 225644" src="https://github.com/user-attachments/assets/be63e7c8-6a69-4d2f-8372-5695b4bcf9f4" />
+<img width="828" height="252" alt="image" src="https://github.com/user-attachments/assets/9f86a247-7bc1-4d71-a79f-c31b2211fb1c" />
 
-Kode tersebut digunakan untuk mengolah data array satu dimensi dengan menampilkan menu pilihan untuk:
 
-Menampilkan isi array.
+Program ini meniru cara kerja struktur data dinamis yang bisa:
 
-Mencari nilai maksimum.
+ 1. Menambah dan menghapus elemen (node) kapan pun.
 
-Mencari nilai minimum.
+2. Menelusuri dan menghitung jumlah node.
 
-Menghitung nilai rata-rata.
+3. Membersihkan seluruh isi list dari memori setelah selesai.
 
-Program akan terus berjalan sampai pengguna memilih menu keluar (5).
+Ini sangat berguna buat memahami dasar-dasar pengelolaan memori di C++.
 
 #### Full code Screenshot:
-<img width="1757" height="929" alt="Cuplikan layar 2025-10-08 225716" src="https://github.com/user-attachments/assets/fa46bf02-3edb-4039-8e12-34dbd7ae452c" />
+<img width="1332" height="857" alt="image" src="https://github.com/user-attachments/assets/aa790607-277b-40da-8ad7-431ceb333897" />
+<img width="1322" height="867" alt="image" src="https://github.com/user-attachments/assets/a9f6d763-e0dd-440a-b227-678ba1396aab" />
+<img width="1332" height="861" alt="image" src="https://github.com/user-attachments/assets/9ec5e9a0-20d1-421a-b789-5351b1446713" />
+
 
 ## Kesimpulan
-Modul ini menjelaskan dasar penggunaan fungsi, pointer, reference, dan array dalam bahasa C++. Melalui percobaan program, mahasiswa dapat memahami bagaimana fungsi digunakan untuk membagi program menjadi bagian yang lebih terstruktur, serta bagaimana pointer dan reference memungkinkan perubahan nilai variabel secara langsung melalui alamat memori. Selain itu, penggunaan array membantu dalam pengolahan data yang jumlahnya banyak secara lebih efisien. Dengan menguasai konsep-konsep ini, pemrogram dapat menulis kode yang lebih rapi, efisien, dan mudah dikembangkan.
+Pada modul ini dipelajari konsep dasar struktur data dinamis menggunakan Singly Linked List, yaitu kumpulan elemen (node) yang saling terhubung melalui pointer. Melalui praktikum ini, mahasiswa memahami bagaimana cara membuat list, menambah elemen di awal list (insertFirst), menampilkan isi list (printInfo), serta melakukan operasi penghapusan node (deleteFirst, deleteLast, deleteAfter).
+Selain itu, fungsi nbList digunakan untuk menghitung jumlah node, dan deleteList untuk menghapus seluruh isi list dari memori. Dengan demikian, modul ini menekankan pentingnya pengelolaan memori dan implementasi pointer dalam membangun struktur data yang fleksibel dan efisien.
+
 ## Referensi
 [1] I. Holm, Narrator, and J. Fullerton-Smith, Producer, How to Build a Human [DVD]. London: BBC; 2002.
