@@ -1,4 +1,4 @@
-# <h1 align="center">Laporan Praktikum Modul 4
+# <h1 align="center">Laporan Praktikum Singly Linked Link Modul 4
 <p align="center">Nofia Dewi Fitriana  </p>
 
 ## Dasar Teori
