@@ -685,89 +685,127 @@ address findElm(List L, infotype x);
 <img width="1470" height="708" alt="image" src="https://github.com/user-attachments/assets/1462471d-90f2-4862-9f99-2c7fdcf379f0" />
 <img width="1469" height="754" alt="image" src="https://github.com/user-attachments/assets/c290c6d7-360e-411a-9629-076467ea4e93" />
 
-### stack3.cpp
+### stack3.main
 ```C++
+#include "stack3.h"
 #include <iostream>
-#include "singlylist.h"
 using namespace std;
 
 int main() {
-    List L;
-    address P1, P2, P3, P4, P5 = NULL;
+    Stack S;
+    createStack(S);
 
-    createList(L);
+    getInputStream(S);
 
-    P1 = alokasi(2);
-    insertFirst(L, P1);
+    cout << "\nStack awal:\n";
+    printInfo(S);
 
-    P2 = alokasi(0);
-    insertFirst(L, P2);
+    cout << "\nBalik stack...\n";
+    balikStack(S);
 
-    P3 = alokasi(8);
-    insertFirst(L, P3);
-
-    P4 = alokasi(12);
-    insertFirst(L, P4);
-
-    P5 = alokasi(9);
-    insertFirst(L, P5);
-
-    printInfo(L);
-
-    // Panggil fungsi baru
-    findElm(L, 8);
+    cout << "Stack setelah dibalik:\n";
+    printInfo(S);
 
     return 0;
 }
 
 ```
-### stack.h
+### stack3.cpp
 ```C++
+#include "stack3.h"
 #include <iostream>
-#include "singlylist.h"
 using namespace std;
 
-void createList(List &L) {
-    L.First = NULL;
+void createStack(Stack &s) {
+    s.top = -1;
 }
 
-address alokasi(infotype x) {
-    address P = new ElmList;
-    P->info = x;
-    P->next = NULL;
-    return P;
+bool isEmpty(Stack s) {
+    return s.top == -1;
 }
 
-void dealokasi(address P) {
-    delete P;
+bool isFull(Stack s) {
+    return s.top == MAX - 1;
 }
 
-void printInfo(List L) {
-    address P = L.First;
-    while (P != NULL) {
-        cout << P->info << " ";
-        P = P->next;
+void push(Stack &s, int x) {
+    if (isFull(s)) return;
+    s.top++;
+    s.data[s.top] = x;
+}
+
+void pop(Stack &s) {
+    if (isEmpty(s)) return;
+    s.top--;
+}
+
+void printInfo(Stack s) {
+    if (isEmpty(s)) {
+        cout << "[TOP] (kosong)\n";
+        return;
+    }
+
+    cout << "[TOP] ";
+    for (int i = s.top; i >= 0; i--) {
+        cout << s.data[i] << " ";
     }
     cout << endl;
 }
 
-void insertFirst(List &L, address P) {
-    P->next = L.First;
-    L.First = P;
+void getInputStream(Stack &s) {
+    cout << "Masukkan input (tekan ENTER untuk berhenti): ";
+    string input;
+    getline(cin, input);
+
+    for (char c : input) {
+        if (isdigit(c)) {
+            push(s, c - '0');
+        }
+    }
 }
 
-address findElm(List L, infotype x) {
-    address P = L.First;
-    while (P != NULL) {
-        if (P->info == x) {
-            cout << x << " ditemukan dalam list" << endl;
-            return P;
-        }
-        P = P->next;
+// versi balik stack yang TERBUKTI JALAN
+void balikStack(Stack &s) {
+    Stack temp;
+    createStack(temp);
+
+    while (!isEmpty(s)) {
+        push(temp, s.data[s.top]);
+        pop(s);
     }
-    cout << x << " tidak ditemukan dalam list" << endl;
-    return NULL;
+
+    while (!isEmpty(temp)) {
+        push(s, temp.data[temp.top]);
+        pop(temp);
+    }
 }
+
+```
+### stack3.h
+```C++
+#ifndef STACK3_H
+#define STACK3_H
+
+#include <iostream>
+using namespace std;
+
+const int MAX = 20;
+
+struct Stack {
+    int data[MAX];
+    int top;
+};
+
+void createStack(Stack &s);
+bool isEmpty(Stack s);
+bool isFull(Stack s);
+void push(Stack &s, int x);
+void pop(Stack &s);
+void printInfo(Stack s);
+void getInputStream(Stack &s);
+void balikStack(Stack &s);
+
+#endif
 
 
 ```
