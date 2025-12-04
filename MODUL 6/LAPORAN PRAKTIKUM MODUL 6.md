@@ -1,4 +1,4 @@
-# <h1 align="center">Laporan Praktikum Doubly Linked List Modul 6
+# <h1 align="center">Laporan Praktikum Modul 6 Doubly Linked List
 <p align="center">Nofia Dewi Fitriana  </p>
 
 ## Dasar Teori
