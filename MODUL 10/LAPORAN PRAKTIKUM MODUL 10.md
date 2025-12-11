@@ -1,591 +1,457 @@
-# <h1 align="center">Laporan Praktikum Modul 8 QUEUE
+# <h1 align="center">Laporan Praktikum Modul 10 TREE (BAGIAN PERTAMA)
 <p align="center">Nofia Dewi Fitriana  </p>
 
 ## Dasar Teori
-Queue (dibaca: kyu) merupakan struktur data yang dapat diumpamakan seperti sebuah antrean. Misalkan antrean pada loket pembelian tiket Kereta Api, di mana orang-orang berdiri berurutan menunggu giliran mereka. Orang yang akan mendapatkan pelayanan yang pertama adalah orang yang pertamakali masuk dalam antrean tersebut, sedangkan yang terakhir masuk dia akan mendapatkan layanan yang terakhir pula. Hal ini menunjukkan bahwa prinsip dasar dalam Queue adalah FIFO (First In First Out), yang artinya proses yang pertama masuk akan diakses terlebih dahulu, dan proses yang terakhir masuk akan diakses paling akhir. Konsep ini sangat penting dalam berbagai sistem komputer, misalnya pada antrian print di printer, penjadwalan proses di sistem operasi, atau penanganan permintaan data pada jaringan komputer. Dalam pengimplementasian struktur Queue dalam bahasa pemrograman C, Queue dapat dibuat menggunakan tipe data array, di mana elemen-elemen disimpan secara berurutan dalam indeks tertentu, atau menggunakan linked list, yang memungkinkan penambahan dan penghapusan elemen secara dinamis tanpa batasan ukuran tetap. Dengan demikian, Queue menjadi salah satu struktur data fundamental yang efisien untuk mengatur urutan proses atau data yang masuk dan keluar berdasarkan prinsip FIFO.
+Rekursif adalah metode pemrograman di mana sebuah fungsi memanggil dirinya sendiri untuk menyelesaikan masalah yang dapat dipecah menjadi sub-masalah yang lebih kecil. Setiap fungsi rekursif harus memiliki base case sebagai kondisi berhenti dan recursive case yang terus memecah masalah hingga mencapai base case. Rekursif membuat kode lebih sederhana dan mudah dibaca, tetapi dapat lebih lambat dan menghabiskan memori karena banyaknya pemanggilan fungsi.
+
+Tree merupakan struktur data non-linear yang tersusun dari node-node yang terhubung secara hierarkis. Sebuah tree memiliki root sebagai node utama, kemudian node lain yang dapat menjadi parent, child, sibling, atau leaf (node tanpa anak). Hubungan-hubungan ini membentuk hierarki yang merepresentasikan data bertingkat. Salah satu jenis tree yang paling banyak digunakan adalah Binary Tree, yaitu tree di mana setiap node memiliki maksimal dua anak. Bentuk khususnya adalah Binary Search Tree (BST), yang menyimpan data dengan aturan: nilai yang lebih kecil berada di subtree kiri dan nilai yang lebih besar berada di subtree kanan. Aturan ini memudahkan operasi pencarian, penyisipan, dan traversal. Traversal tree dapat dilakukan dengan beberapa cara, seperti in-order, pre-order, dan post-order, masing-masing digunakan untuk tujuan yang berbeda dalam pengolahan data.
+
 ## Guided 
 
-### queue.h
+### bst.h
 
 ```C++
-#ifndef QUEUE_H
-#define QUEUE_H
+#ifndef BST_H
+#define BST_H
+#define Nil NULL
 
-#include <iostream>
-#include <string>
 using namespace std;
 
-struct Node {
-    string nama;
-    Node* next;
+typedef struct BST *node;
+
+struct BST{
+    int angka;
+    node left;
+    node right;
 };
 
-struct queue {
-    Node* head;
-    Node* tail;
-};
+typedef node BinTree;
 
-void CreateQueue(queue &Q);
-bool isEmpty(queue Q);
-bool isFull(queue Q);
-void enQueue(queue &Q, const string &nama);
-void deQueue(queue &Q);
-void viewQueue(queue Q);
-void clearQueue(queue &Q);
+bool isEmpty(BinTree tree);
+void createTree(BinTree &tree);
+node alokasi(int angka);
+void dealokasi(node nodeHapus);
+
+void insertNode(BinTree &tree, node nodeBaru);
+void searchByData(BinTree tree, int angka);
+void preOrder(BinTree tree);
+void inOrder(BinTree tree);
+void postOrder(BinTree tree);
+
+bool deleteNode(BinTree tree, int angka);
+node mostRight(BinTree tree);
+node mostLeft(BinTree tree);
+void deleteTree(BinTree tree);
+int size(BinTree tree);
+int height(BinTree tree);
 
 #endif
+
 ```
 
-### queue.cpp
+### bst.cpp
 
 ```C++
-#include "queue.h"
+#include "bst.h"
+#include <iostream>
+
 using namespace std;
 
-void CreateQueue(queue &Q) {
-    Q.head = nullptr;
-    Q.tail = nullptr;
-}
+//NOTE : parameter tree disini maksaaaudnya merujuk ke node; baik itu node root atau node lain dari tree
 
-bool isEmpty(queue Q) {
-    return Q.head == nullptr;
-}
-
-bool isFull(queue) {
-    return false;
-}
-
-void enQueue(queue &Q, const string &nama) {
-    Node* baru = new Node{nama, nullptr};
-    if (isEmpty(Q)) {
-        Q.head = Q.tail = baru;
+bool isEmpty(BinTree tree){
+    if(tree == Nil){
+        return true;
     } else {
-        Q.tail->next = baru;
-        Q.tail = baru;
+        return false;
     }
-    cout << "nama " << nama << " berhasil ditambahkan kedalam queue!" << endl;
 }
 
-void deQueue(queue &Q) {
-    if (isEmpty(Q)) {
-        cout << "Queue kosong!" << endl;
+void createTree(BinTree &tree){
+    tree = Nil;
+}
+
+node alokasi(int angkaInput){
+    node nodeBaru = new BST;
+    nodeBaru->angka = angkaInput;
+    nodeBaru->left = Nil;
+    nodeBaru->right = Nil;
+    return nodeBaru;
+}
+
+void dealokasi(node nodeHapus){
+    delete nodeHapus;
+}
+
+void insertNode(BinTree &tree, node nodeBaru){
+    if(tree == Nil){
+        tree = nodeBaru;
+        cout << "Node " << nodeBaru->angka << " berhasil ditambahkan ke dalam tree!" << endl;
+        return;
+    } else if(nodeBaru->angka < tree->angka){
+        insertNode(tree->left, nodeBaru);
+    } else if(nodeBaru->angka > tree->angka){
+        insertNode(tree->right, nodeBaru);
+    }
+}
+
+void searchByData(BinTree tree, int angkaCari){
+    if(isEmpty(tree) == true){
+        cout << "Tree kosong!" << endl;
+    } else {
+        node nodeBantu = tree;
+        node parent = Nil;
+        bool ketemu = false;
+        while(nodeBantu != Nil){
+            if(angkaCari < nodeBantu->angka){
+                parent = nodeBantu;
+                nodeBantu = nodeBantu->left;
+            } else if(angkaCari > nodeBantu->angka){
+                parent = nodeBantu;
+                nodeBantu = nodeBantu->right;
+            } else if(angkaCari == nodeBantu->angka){
+                ketemu = true;
+                break;
+            }
+        }
+        if(ketemu == false){
+            cout << "Data tidak ditemukan" << endl;
+        } else if(ketemu == true){
+            cout << "Data ditemukan didalam tree!" << endl;
+            cout << "Data Angka : " << nodeBantu->angka << endl;
+
+            //menampilkan parentnya & pengecekan sibling
+            node sibling = Nil;
+            if(parent != Nil){
+                cout << "Parent : " << parent->angka << endl;
+                if(parent->left == nodeBantu){
+                    sibling = parent->right;
+                } else if(parent->right == nodeBantu){
+                    sibling = parent->left;
+                }
+            } else {
+                cout << "Parent : - (node root)"<< endl;
+            }
+
+            //menampilkan siblingnya
+            if(sibling != Nil){
+                cout << "Sibling : " << sibling->angka << endl;
+            } else {
+                cout << "Sibling : - " << endl;
+            }
+
+            //menampilkan childnya
+            if(nodeBantu->left != Nil){
+                cout << "Child kiri : " << nodeBantu->left->angka << endl;
+            } else if(nodeBantu->left == Nil){
+                cout << "Child kiri : -" << endl;
+            }
+            if(nodeBantu->right != Nil){
+                cout << "Child kanan : " << nodeBantu->right->angka << endl;
+            } else if(nodeBantu->right == Nil){
+                cout << "Child kanan : -" << endl;
+            }
+        }
+    }
+}
+
+void preOrder(BinTree tree){
+    if(tree == Nil){
         return;
     }
-    Node* hapus = Q.head;
-    cout << "Menghapus data " << hapus->nama << "..." << endl;
-    Q.head = Q.head->next;
-    if (Q.head == nullptr) {
-        Q.tail = nullptr;
-    }
-    delete hapus;
+    cout << tree->angka << " - ";
+    preOrder(tree->left);
+    preOrder(tree->right);
 }
 
-void viewQueue(queue Q) {
-    if (isEmpty(Q)) {
-        cout << "Queue kosong!" << endl;
+void inOrder(BinTree tree){
+    if(tree == Nil){
         return;
     }
-    int i = 1;
-    for (Node* p = Q.head; p != nullptr; p = p->next) {
-        cout << i++ << ". " << p->nama << endl;
+    inOrder(tree->left);
+    cout << tree->angka << " - ";
+    inOrder(tree->right);
+}
+
+void postOrder(BinTree tree){
+    if(tree == Nil){
+        return;
+    }
+    postOrder(tree->left);
+    postOrder(tree->right);
+    cout << tree->angka << " - ";
+}
+
+
+bool deleteNode(BinTree tree, int angka){
+    if (tree == Nil) {
+        return false; //data tidak ditemukan di subtree ini
+    } else {
+        if (angka < tree->angka) {
+            return deleteNode(tree->left, angka);
+        } else if (angka > tree->angka) {
+            return deleteNode(tree->right, angka);
+        } else {
+            //jika node yang mau dihapus ditemukan
+            //Case 1 : node yang mau dihapus adalah leaf
+            if (tree->left == Nil && tree->right == Nil) {
+                node tmp = tree;
+                tree = Nil;
+                dealokasi(tmp);
+            }
+            //Case 2 : node yang mau dihapus hanya punya right child
+            else if (tree->left == Nil) {
+                node tmp = tree;
+                tree = tree->right;
+                dealokasi(tmp);
+            }
+            //Case 3 : node yang mau dihapus hanya punya left child
+            else if (tree->right == Nil) {
+                node tmp = tree;
+                tree = tree->left;
+                dealokasi(tmp);
+            }
+            // Case 4 : jika node yang mau dihapus punya dua child, maka ambil mostleft dari subtree kanan untuk menggantikan node yang mau dihapus
+            else {
+                //mostleft dari subtree kanan = node successor (node penerus)
+                node successor = mostLeft(tree->right);
+                //salin data successor ke node saat ini
+                tree->angka = successor->angka;
+                //hapus successor pada subtree kanan
+                return deleteNode(tree->right, successor->angka);
+            }
+            return true; //berhasil dihapus
+        }
     }
 }
 
-void clearQueue(queue &Q) {
-    while (!isEmpty(Q)) {
-        deQueue(Q);
+node mostRight(BinTree tree){
+    while (tree->right != Nil){
+        tree = tree->right;
+    }
+    return tree;    
+}
+
+node mostLeft(BinTree tree){
+    while (tree->left != Nil){
+        tree = tree->left;
+    }
+    return tree;
+}
+
+void deleteTree(BinTree tree){
+    if(tree == Nil){
+        return;
+    } else {
+        deleteTree(tree->left);
+        deleteTree(tree->right);
+        dealokasi(tree);
+        tree = Nil;
     }
 }
+
+int size(BinTree tree){ //mengembalikan jumlah semua node
+    if(isEmpty(tree) == true){
+        return 0;
+    } else {
+        return 1 + size(tree->left) + size(tree->right);
+    }
+    cout << endl;
+}
+
+int height(BinTree tree){ //mengembalikan jumlah level tree
+    if(isEmpty(tree) == true){
+        return -1; //tree kosong jika height = -1
+    } else {
+        int hl = height(tree->left);
+        int hr = height(tree->right);
+        int maxHeight;
+        if (hl > hr){
+            maxHeight = hl;
+        } else {
+            maxHeight = hr;
+        }
+        return 1 + maxHeight;
+    }
+    cout << endl;
+}
+
 ```
 
 ### main.cpp
 
 ```C++
-#include "queue.h"
 #include <iostream>
+#include "bstree.h"
 using namespace std;
 
 int main() {
-    queue Q;
-    CreateQueue(Q);
+    cout << "Hello world!" << endl;
 
-    enQueue(Q, "dhimas");
-    enQueue(Q, "Arvin");
-    enQueue(Q, "Rizal");
-    enQueue(Q, "Hafizh");
-    enQueue(Q, "Fathur");
-    enQueue(Q, "Atha");
+    address root = NULL;
+
+    // insert nodes
+    insertNode(root, 1);
+    insertNode(root, 2);
+    insertNode(root, 6);
+    insertNode(root, 4);
+    insertNode(root, 5);
+    insertNode(root, 3);
+    insertNode(root, 0);
+    insertNode(root, 7);
+
+    // print in-order
+    inOrder(root);
     cout << endl;
 
-    cout << "--- Isi Queue Setelah enQueue ---" << endl;
-    viewQueue(Q);
-
-    deQueue(Q);
-    deQueue(Q);
-    deQueue(Q);
-    deQueue(Q);
-    cout << endl;
-
-    cout << "--- Isi Queue Setelah deQueue ---" << endl;
-    viewQueue(Q);
-
-    clearQueue(Q);
-    return 0;
-}
-```
-### queue.h
-
-```C++
-// guided2 queue.h
-#ifndef QUEUE_H
-#define QUEUE_H
-
-#include<iostream>
-using namespace std;
-
-const int MAKSIMAL = 5;
-
-struct queue{
-    string nama[MAKSIMAL];
-    int head;
-    int tail;
-};
-
-bool isFull(queue Q);
-bool isEmpty(queue Q);
-void CreateQueue(queue &Q); //terbentuk queue dengan head = -1 dan tail = -1 
-void enQueue(queue &Q, string nama);
-void deQueue(queue &Q);
-void viewQueue(queue Q);
-
-#endif
-```
-### queue.cpp
-
-```C++
-#include "queue.h"
-#include <iostream>
-
-using namespace std;
-
-// NOTE : 
-// Implementasi 1 = head diam, tail bergerak (Queue Linear Statis, kerana head nya tetap diam)
-// Implementasi 2 = head bergerak, tail bergerak (Queue Linear Dinamis, karena head & tail nya sama-sama bergerak)
-// Implementasi 3 = head dan tail berputar (Queue Circular, karena jika udh mentok tapi masih ada space, diputar sehingga tail bisa ada didepan head)
-
-bool isEmpty(queue Q){
-    if(Q.head == -1 && Q.tail == -1){
-        return true;
-    } else {
-        return false;
-    }
-}
-
-// //isFull implmenetasi 1 & 2
-// bool isFull(queue Q){
-//     if(Q.tail == MAKSIMAL - 1){
-//         return true;
-//     } else {
-//         return false;
-//     }
-// }
-
-//isFull implementasi 3
-bool isFull(queue Q){
-    if((Q.tail + 1) % MAKSIMAL == Q.head){
-        return true;
-    } else {
-        return false;
-    }
-}
-
-void CreateQueue(queue &Q){ //terbentuk queue dengan head = -1 dan tail = -1 
-    Q.head = -1;
-    Q.tail = -1;
-}
- 
-// //enqueue implementasi 1 & 2
-// void enQueue(queue &Q, string nama){
-//     if(isFull(Q) == true){
-//         cout << "Queue sudah penuh!" << endl;
-//     } else {
-//         if(isEmpty(Q) == true){
-//             Q.head = Q.tail = 0;
-//         } else {
-//             Q.tail++;
-//         }
-//         Q.nama[Q.tail] = nama;
-//         cout << "nama " << nama << " berhasil ditambahkan kedalam queue!" << endl;
-//     }
-// }
-
-//enQueue implementasi 3
-void enQueue(queue &Q, string nama){
-    if(isFull(Q) == true){
-        cout << "Queue sudah penuh!" << endl;
-    } else {
-        if(isEmpty(Q) == true){
-            Q.head = Q.tail = 0;
-        } else {
-            Q.tail = (Q.tail + 1) % MAKSIMAL; // bergerak melingkar
-        }
-        Q.nama[Q.tail] = nama;
-        cout << "nama " << nama << " berhasil ditambahkan kedalam queue!" << endl;
-    }
-}
-
-// //dequeue implementasi 1
-// void deQueue(queue &Q){
-//     if(isEmpty(Q) == true){
-//         cout << "Queue kosong!" << endl;
-//     } else {
-//         cout << "Mengahapus data " << Q.nama[Q.head] << "..." << endl;
-//         for(int i = 0; i < Q.tail; i++){
-//             Q.nama[i] =  Q.nama[i+1];
-//         }
-//         Q.tail--;
-//         if(Q.tail < 0){ //kalo semua isi queue nya udh dikelaurin, set head & tail ke -1
-//             Q.head = -1;
-//             Q.tail = -1;
-//         }
-//     }
-// }
-
-// //dequeue implementasi 2
-// void deQueue(queue &Q){
-//     if(isEmpty(Q) == true){
-//         cout << "Queue kosong!" << endl;
-//     } else {
-//         cout << "Mengahapus data " << Q.nama[Q.head] << "..." << endl;
-//         Q.head++;
-//         if(Q.head > Q.tail){ //kalo elemennya udh abis (head akan lebih 1 dari tail), maka reset ulang head & tail ke -1
-//             Q.head = -1;
-//             Q.tail = -1;
-//         }
-//     }
-// }
-
-//deQueue implementasi 3
-void deQueue(queue &Q){
-    if(isEmpty(Q) == true){
-        cout << "Queue kosong!" << endl;
-    } else {
-        cout << "Mengahapus data " << Q.nama[Q.head] << "..." << endl;
-        if(Q.head == Q.tail){ //kalo elemennya tinggal 1, langsungkan saja head & tail nya reset ke -1
-            Q.head = -1;
-            Q.tail = -1;
-        } else {
-            Q.head = (Q.head + 1) % MAKSIMAL; // bergerak melingkar
-        }
-    }
-}
-
-// //viewQueue implementasi 1 & 2
-// void viewQueue(queue Q){
-//     if(isEmpty(Q) == true){
-//         cout << "Queue kosong!" << endl;
-//     } else {
-//         for(int i = Q.head; i <= Q.tail; i++){
-//             cout << i -  Q.head + 1 << ". " << Q.nama[i] << endl;
-//         }
-//     }
-//     cout << endl;
-// }
-
-//viewQueue implementasi 3
-void viewQueue(queue Q){
-    if(isEmpty(Q) == true){
-        cout << "Queue kosong!" << endl;
-    } else {
-        int i = Q.head;
-        int count = 1;
-        while(true){
-            cout << count << ". " << Q.nama[i] << endl;
-            if(i == Q.tail){
-                break;
-            }
-            i = (i + 1) % MAKSIMAL;
-            count++;
-        }   
-    }
-}
-```
-### main.cpp
-
-```C++
-#include "queue.h"
-#include <iostream>
-
-using namespace std;
-
-int main(){
-    queue Q;
-
-    CreateQueue(Q);
-    enQueue(Q, "dhimas");
-    enQueue(Q, "Arvin");
-    enQueue(Q, "Rizal");
-    enQueue(Q, "Hafizh");
-    enQueue(Q, "Fathur");
-    enQueue(Q, "Atha");
-    cout << endl;
-
-    cout << "--- Isi Queue Setelah enQueue ---" << endl;
-    viewQueue(Q);
-
-    deQueue(Q);
-    deQueue(Q);
-    deQueue(Q);
-    deQueue(Q);
-    // deQueue(Q);
-    // deQueue(Q);
-    cout << endl;
-
-    cout << "--- Isi Queue Setelah deQueue ---" << endl;
-    viewQueue(Q);
+    // menahan console seperti CodeBlocks
+    system("pause");
 
     return 0;
 }
+
 ```
+
 ## Unguided 
-<img width="838" height="710" alt="image" src="https://github.com/user-attachments/assets/ad458da5-e8b8-4d64-b774-21bc19538be4" />
+<img width="781" height="817" alt="image" src="https://github.com/user-attachments/assets/22b4e2f9-b52d-468f-b03d-f8e164d91482" />
 
 ### main1.cpp
 
 ```C++
 #include <iostream>
-#include "soal1.h"
+#include "bstree.h"
 using namespace std;
 
 int main() {
     cout << "Hello world!" << endl;
-    Queue Q;
-    createQueue(Q);
 
-    cout << "----------------------------" << endl;
-    cout << " H - T \t | Queue Info" << endl;
-    cout << "----------------------------" << endl;
+    address root = NULL;
 
-    printInfo(Q);
+    // insert nodes
+    insertNode(root, 1);
+    insertNode(root, 2);
+    insertNode(root, 6);
+    insertNode(root, 4);
+    insertNode(root, 5);
+    insertNode(root, 3);
+    insertNode(root, 0);
+    insertNode(root, 7);
 
-    enqueue(Q, 5);
-    printInfo(Q);
-
-    enqueue(Q, 2);
-    printInfo(Q);
-
-    enqueue(Q, 7);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
-
-    enqueue(Q, 4);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
+    // print in-order
+    inOrder(root);
+    cout << endl;
 
     return 0;
 }
 
 ```
-### soal1.cpp
+### bstree.cpp
 
 ```C++
 #include <iostream>
-#include "soal1.h"
+#include "bstree.h"
 using namespace std;
 
-void createQueue(Queue &Q) {
-    Q.head = -1;
-    Q.tail = -1;
+address alokasi(infotype x) {
+    address p = new Node;
+    p->info = x;
+    p->left = NULL;
+    p->right = NULL;
+    return p;
 }
 
-bool isEmptyQueue(Queue Q) {
-    return (Q.head == -1 && Q.tail == -1);
+void insertNode(address &root, infotype x) {
+    if (root == NULL) {
+        root = alokasi(x);
+    } else if (x < root->info) {
+        insertNode(root->left, x);
+    } else if (x > root->info) {
+        insertNode(root->right, x);
+    }
 }
 
-bool isFullQueue(Queue Q) {
-    return (Q.tail == MAX - 1);
+address findNode(infotype x, address root) {
+    if (root == NULL)
+        return NULL;
+    else if (x == root->info)
+        return root;
+    else if (x < root->info)
+        return findNode(x, root->left);
+    else
+        return findNode(x, root->right);
 }
 
-// --------- ENQUEUE (head diam, tail maju) ---------
-void enqueue(Queue &Q, infotype x) {
-    if (isFullQueue(Q)) {
-        cout << "Queue penuh!" << endl;
-        return;
+void inOrder(address root) {
+    if (root != NULL) {
+        inOrder(root->left);
+        cout << root->info << " - ";
+        inOrder(root->right);
     }
-    if (isEmptyQueue(Q)) {
-        Q.head = 0;
-        Q.tail = 0;
-    } else {
-        Q.tail++;
-    }
-    Q.info[Q.tail] = x;
-}
-
-infotype dequeue(Queue &Q) {
-    if (isEmptyQueue(Q)) {
-        cout << "Queue kosong!" << endl;
-        return -1;
-    }
-
-    infotype temp = Q.info[Q.head];
-
-    // Geser elemen ke kiri
-    for (int i = Q.head; i < Q.tail; i++) {
-        Q.info[i] = Q.info[i + 1];
-    }
-
-    Q.tail--;
-
-    if (Q.tail < Q.head) {  
-        Q.head = -1;
-        Q.tail = -1;
-    }
-
-    return temp;
-}
-
-void printInfo(Queue Q) {
-    cout << Q.head << " - " << Q.tail << " \t| ";
-
-    if (isEmptyQueue(Q)) {
-        cout << "empty queue" << endl;
-        return;
-    }
-
-    for (int i = Q.head; i <= Q.tail; i++) {
-        cout << Q.info[i] << " ";
-    }
-    cout << endl;
 }
 
 ```
 
-### soal1.h
+### bstree.h
 
 ```C++
-#include <iostream>
-#include "soal1.h"
-using namespace std;
+#ifndef BSTREE_H
+#define BSTREE_H
 
-void createQueue(Queue &Q) {
-    Q.head = -1;
-    Q.tail = -1;
-}
+typedef int infotype;
 
-bool isEmptyQueue(Queue Q) {
-    return (Q.head == -1 && Q.tail == -1);
-}
+typedef struct Node *address;
 
-bool isFullQueue(Queue Q) {
-    return (Q.tail == MAX - 1);
-}
+struct Node {
+    infotype info;
+    address left;
+    address right;
+};
 
-void enqueue(Queue &Q, infotype x) {
-    if (isFullQueue(Q)) {
-        cout << "Queue penuh!" << endl;
-        return;
-    }
-    if (isEmptyQueue(Q)) {
-        Q.head = 0;
-        Q.tail = 0;
-    } else {
-        Q.tail++;
-    }
-    Q.info[Q.tail] = x;
-}
+address alokasi(infotype x);
+void insertNode(address &root, infotype x);
+address findNode(infotype x, address root);
+void inOrder(address root);
 
-infotype dequeue(Queue &Q) {
-    if (isEmptyQueue(Q)) {
-        cout << "Queue kosong!" << endl;
-        return -1;
-    }
-
-    infotype temp = Q.info[Q.head];
-
-    // Geser elemen ke kiri
-    for (int i = Q.head; i < Q.tail; i++) {
-        Q.info[i] = Q.info[i + 1];
-    }
-
-    Q.tail--;
-
-    if (Q.tail < Q.head) {  
-        Q.head = -1;
-        Q.tail = -1;
-    }
-
-    return temp;
-}
-
-// --------- PRINT INFO ---------
-void printInfo(Queue Q) {
-    cout << Q.head << " - " << Q.tail << " \t| ";
-
-    if (isEmptyQueue(Q)) {
-        cout << "empty queue" << endl;
-        return;
-    }
-
-    for (int i = Q.head; i <= Q.tail; i++) {
-        cout << Q.info[i] << " ";
-    }
-    cout << endl;
-}
+#endif
 
 ```
 #### Output:
-<img width="792" height="339" alt="Screenshot 2025-11-27 201647" src="https://github.com/user-attachments/assets/a2e1a7bd-b64f-435c-9714-5b527b7e66aa" />
+<img width="633" height="128" alt="image" src="https://github.com/user-attachments/assets/87551b3e-a242-4be4-88bf-a452dce348e6" />
+
+Program ini menjelaskan tentang pembuatan dan penggunaan Binary Search Tree (BST) secara dasar, yaitu bagaimana memasukkan data ke dalam BST, mencari node tertentu, dan mencetak isi tree dalam urutan yang terurut (in-order). File `bstree.h` mendefinisikan struktur Node dan deklarasi fungsi, `bstree.cpp` berisi implementasi fungsi seperti `alokasi()` untuk membuat node baru, `insertNode()` untuk memasukkan nilai ke BST sesuai aturan kiri-lebih-kecil dan kanan-lebih-besar, `findNode()` untuk mencari nilai tertentu, serta `inOrder()` untuk mencetak data dari kecil ke besar. File `main1.cpp` kemudian menggunakan fungsi-fungsi tersebut untuk membangun sebuah BST dari beberapa nilai, lalu menampilkan hasil traversal in-order. Singkatnya, program ini adalah contoh implementasi struktur data Binary Search Tree lengkap dengan insert, search, dan traversal.
 
 #### Full code Screenshot:
-<img width="1919" height="1141" alt="image" src="https://github.com/user-attachments/assets/472045d1-94ed-4a8c-bdcc-dec3ef5c57a9" />
-<img width="1912" height="1130" alt="image" src="https://github.com/user-attachments/assets/3c579b5e-a935-49a0-91e4-02f12ec0a64d" />
-<img width="1919" height="1139" alt="image" src="https://github.com/user-attachments/assets/0b079e59-8ebe-4786-b504-d509291e9fac" />
-
+<img width="1919" height="1141" alt="image" src="https://github.com/user-attachments/assets/47de5ca5-96b4-4f17-a378-227892965c72" />
+<img width="1912" height="1127" alt="image" src="https://github.com/user-attachments/assets/0e763156-e740-4e8f-8dc4-a142be2b2d5d" />
+<img width="1919" height="1127" alt="image" src="https://github.com/user-attachments/assets/8fde0bcc-f92b-4cda-a203-ba182eefdeaa" />
 
 ### 
-<img width="565" height="40" alt="image" src="https://github.com/user-attachments/assets/952640ad-0202-4eac-8b46-31cb6614ecf6" />
+<img width="783" height="907" alt="image" src="https://github.com/user-attachments/assets/5ef48789-98e8-418d-b0a6-0e7346cfe8e5" />
 
 ### main2.cpp
 ```C++
-#include <iostream>
 #include "soal2.h"
-using namespace std;
 
 int main() {
     cout << "Hello world!" << endl;
 
-    Queue Q;
-    createQueue(Q);
+    address root = NULL;
 
-    printInfo(Q);
+    insertNode(root, 1);
+    insertNode(root, 2);
+    insertNode(root, 6);
+    insertNode(root, 4);
+    insertNode(root, 5);
+    insertNode(root, 3);
+    insertNode(root, 6);
+    insertNode(root, 7);
 
-    enqueue(Q, 5);
-    printInfo(Q);
+    InOrder(root);
+    cout << "\n\n";
 
-    enqueue(Q, 2);
-    printInfo(Q);
-
-    enqueue(Q, 7);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
-
-    enqueue(Q, 4);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
+    cout << "kedalaman : " << hitungKedalaman(root, 0) << endl;
+    cout << "jumlah node : " << hitungJumlahNode(root) << endl;
+    cout << "total : " << hitungTotalInfo(root) << endl;
 
     return 0;
 }
@@ -593,72 +459,50 @@ int main() {
 ```
 ### soal2.cpp
 ```C++
-#include <iostream>
+
 #include "soal2.h"
-using namespace std;
 
-void createQueue(Queue &Q) {
-    Q.head = -1;
-    Q.tail = -1;
+void insertNode(address &root, int x) {
+    if (root == NULL) {
+        root = new Node;
+        root->info = x;
+        root->left = root->right = NULL;
+    } 
+    else if (x < root->info) {
+        insertNode(root->left, x);
+    } 
+    else if (x > root->info) {
+        insertNode(root->right, x);
+    }
+    else {
+        // nilai sama → jangan dimasukkan (BST modul tidak menerima duplikat)
+    }
 }
 
-bool isEmptyQueue(Queue Q) {
-    return (Q.head == -1);
+
+void InOrder(address root) {
+    if (root != NULL) {
+        InOrder(root->left);
+        cout << root->info << " - ";
+        InOrder(root->right);
+    }
 }
 
-bool isFullQueue(Queue Q) {
-    return ((Q.tail + 1) % MAX == Q.head);
+int hitungJumlahNode(address root) {
+    if (root == NULL) return 0;
+    return 1 + hitungJumlahNode(root->left) + hitungJumlahNode(root->right);
 }
 
-void enqueue(Queue &Q, infotype x) {
-    if (isFullQueue(Q)) {
-        cout << "Queue penuh!" << endl;
-        return;
-    }
-
-    if (isEmptyQueue(Q)) {
-        Q.head = 0;
-        Q.tail = 0;
-    } else {
-        Q.tail = (Q.tail + 1) % MAX;
-    }
-
-    Q.info[Q.tail] = x;
+int hitungTotalInfo(address root) {
+    if (root == NULL) return 0;
+    return root->info + hitungTotalInfo(root->left) + hitungTotalInfo(root->right);
 }
 
-infotype dequeue(Queue &Q) {
-    if (isEmptyQueue(Q)) {
-        cout << "Queue kosong!" << endl;
-        return -1;
-    }
-
-    infotype x = Q.info[Q.head];
-
-    if (Q.head == Q.tail) { 
-        Q.head = -1;
-        Q.tail = -1;
-    } else {
-        Q.head = (Q.head + 1) % MAX;
-    }
-
-    return x;
-}
-
-void printInfo(Queue Q) {
-    if (isEmptyQueue(Q)) {
-        cout << "-1 - -1\t| empty queue" << endl;
-        return;
-    }
-
-    cout << Q.head << " - " << Q.tail << "\t| ";
-
-    int i = Q.head;
-    while (true) {
-        cout << Q.info[i] << " ";
-        if (i == Q.tail) break;
-        i = (i + 1) % MAX;
-    }
-    cout << endl;
+int hitungKedalaman(address root, int depth) {
+    if (root == NULL) return depth - 1;
+    int leftDepth  = hitungKedalaman(root->left, depth + 1);
+    int rightDepth = hitungKedalaman(root->right, depth + 1);
+    return (leftDepth > rightDepth) ? leftDepth : rightDepth;
 }
 
 ```
@@ -667,211 +511,136 @@ void printInfo(Queue Q) {
 #ifndef SOAL2_H
 #define SOAL2_H
 
-const int MAX = 5;
-typedef int infotype;
+#include <iostream>
+using namespace std;
 
-typedef struct {
-    infotype info[MAX];
-    int head, tail;
-} Queue;
+struct Node {
+    int info;
+    Node *left;
+    Node *right;
+};
 
-// Prosedur dan fungsi
-void createQueue(Queue &Q);
-bool isEmptyQueue(Queue Q);
-bool isFullQueue(Queue Q);
-void enqueue(Queue &Q, infotype x);
-infotype dequeue(Queue &Q);
-void printInfo(Queue Q);
+typedef Node* address;
+
+// Deklarasi fungsi
+void insertNode(address &root, int x);
+void InOrder(address root);
+int hitungJumlahNode(address root);
+int hitungTotalInfo(address root);
+int hitungKedalaman(address root, int depth);
 
 #endif
 
 ```
 #### Output:
-<img width="878" height="269" alt="image" src="https://github.com/user-attachments/assets/f5f8d059-d8e1-486e-90c0-a8888ddb686a" />
+<img width="750" height="246" alt="image" src="https://github.com/user-attachments/assets/b4e57284-ef76-4eda-93d9-fa93c0e6cd3d" />
 
+Program ini menjelaskan cara membangun dan memproses sebuah Binary Search Tree (BST) menggunakan C++, termasuk menambah node, melakukan traversal, serta menghitung informasi penting dari tree. Melalui fungsi `insertNode()`, program membentuk BST dari data yang dimasukkan; fungsi `InOrder()` menampilkan urutan data secara terurut; fungsi `hitungJumlahNode()` menghitung total banyaknya node; `hitungTotalInfo()` menjumlahkan semua nilai yang ada di dalam tree; dan `hitungKedalaman()` menghitung kedalaman maksimum tree. Semua fungsi ini dipisah dalam file header (`soal2.h`), implementasi (`soal2.cpp`), dan program utama (`main2.cpp`) untuk menunjukkan pemrograman terstruktur. Hasil akhirnya menampilkan traversal in-order, kedalaman tree, jumlah node, dan total nilai node dalam BST.
 
 #### Full code Screenshot:
-<img width="1919" height="1136" alt="image" src="https://github.com/user-attachments/assets/9329d1ae-752c-4355-8bb9-5678efc0fd42" />
-<img width="1917" height="1140" alt="image" src="https://github.com/user-attachments/assets/8d99bfc5-eff8-4ecc-9a97-d5f1afd2cb0a" />
-<img width="1917" height="1136" alt="image" src="https://github.com/user-attachments/assets/d7b216b4-e397-456a-b991-7fc08e82b6b7" />
-
+<img width="1919" height="1137" alt="image" src="https://github.com/user-attachments/assets/07794a46-ae21-4c1f-85c5-43e8bddd5921" />
+<img width="1914" height="1135" alt="image" src="https://github.com/user-attachments/assets/1602942b-37ee-4816-891d-6c658d184267" />
+<img width="1919" height="1137" alt="image" src="https://github.com/user-attachments/assets/eb0da926-535f-4fe1-8d23-fbb5b384b0bb" />
 
 ####
-<img width="556" height="40" alt="image" src="https://github.com/user-attachments/assets/77a82d8a-08f2-44f1-8e20-008ba0bf631f" />
 
-### main3.cpp
+<img width="634" height="332" alt="image" src="https://github.com/user-attachments/assets/e1f0130b-a2df-4f53-9c20-eb15880d676c" />
+
+### tree.h
 ```C++
-#ifndef SINGLYLIST_H
-#define SINGLYLIST_H
+#ifndef TREE_H
+#define TREE_H
 
-typedef int infotype;
+#include <iostream>
+using namespace std;
 
-typedef struct ElmList *address;
-
-struct ElmList {
-    infotype info;
-    address next;
+struct Node {
+    int info;
+    Node *left;
+    Node *right;
 };
 
-struct List {
-    address First;
-};
+typedef Node* address;
 
-void createList(List &L);
-address alokasi(infotype x);
-void dealokasi(address P);
-void printInfo(List L);
-void insertFirst(List &L, address P);
+// buat node baru
+address newNode(int x);
 
-address findElm(List L, infotype x);
+// traversal
+void preOrder(address root);
+void postOrder(address root);
 
 #endif
 
 ```
-### stack3.main
+### tree.cpp
 ```C++
-#include <iostream>
-#include "soal3.h"
-using namespace std;
+#include "tree.h"
+
+address newNode(int x) {
+    address p = new Node;
+    p->info = x;
+    p->left = p->right = NULL;
+    return p;
+}
+
+void preOrder(address root) {
+    if (root != NULL) {
+        cout << root->info << " ";
+        preOrder(root->left);
+        preOrder(root->right);
+    }
+}
+
+void postOrder(address root) {
+    if (root != NULL) {
+        postOrder(root->left);
+        postOrder(root->right);
+        cout << root->info << " ";
+    }
+}
+```
+### main3.cpp
+```C++
+#include "tree.h"
 
 int main() {
-    cout << "Circular Queue" << endl;
 
-    Queue Q;
-    createQueue(Q);
+    address root = newNode(6);
+    root->left = newNode(4);
+    root->right = newNode(7);
 
-    printInfo(Q);
+    root->left->left = newNode(2);
+    root->left->right = newNode(5);
 
-    enqueue(Q, 5);
-    printInfo(Q);
+    root->left->left->left = newNode(1);
+    root->left->left->right = newNode(3);
 
-    enqueue(Q, 2);
-    printInfo(Q);
+    cout << "Pre-Order  : ";
+    preOrder(root);
+    cout << endl;
 
-    enqueue(Q, 7);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
-
-    enqueue(Q, 4);
-    printInfo(Q);
-
-    dequeue(Q);
-    printInfo(Q);
+    cout << "Post-Order : ";
+    postOrder(root);
+    cout << endl;
 
     return 0;
 }
 
 ```
-### stack3.cpp
-```C++
-#include <iostream>
-#include "soal3.h"
-using namespace std;
-
-void createQueue(Queue &Q) {
-    Q.head = -1;
-    Q.tail = -1;
-}
-
-bool isEmptyQueue(Queue Q) {
-    return (Q.head == -1);
-}
-
-bool isFullQueue(Queue Q) {
-    return ((Q.tail + 1) % MAX == Q.head);
-}
-
-void enqueue(Queue &Q, infotype x) {
-    if (isFullQueue(Q)) {
-        cout << "Queue penuh!" << endl;
-        return;
-    }
-
-    if (isEmptyQueue(Q)) {
-        Q.head = 0;
-        Q.tail = 0;
-    } else {
-        Q.tail = (Q.tail + 1) % MAX;
-    }
-
-    Q.info[Q.tail] = x;
-}
-
-infotype dequeue(Queue &Q) {
-    if (isEmptyQueue(Q)) {
-        cout << "Queue kosong!" << endl;
-        return -1;
-    }
-
-    infotype x = Q.info[Q.head];
-
-    if (Q.head == Q.tail) {  
-        Q.head = -1;
-        Q.tail = -1;
-    } else {
-        Q.head = (Q.head + 1) % MAX;
-    }
-
-    return x;
-}
-
-void printInfo(Queue Q) {
-    if (isEmptyQueue(Q)) {
-        cout << "-1 - -1\t| empty queue" << endl;
-        return;
-    }
-
-    cout << Q.head << " - " << Q.tail << "\t| ";
-
-    int i = Q.head;
-    while (true) {
-        cout << Q.info[i] << " ";
-        if (i == Q.tail) break;
-        i = (i + 1) % MAX;
-    }
-    cout << endl;
-}
-
-```
-### stack3.h
-```C++
-#ifndef SOAL3_H
-#define SOAL3_H
-
-const int MAX = 5;
-typedef int infotype;
-
-typedef struct {
-    infotype info[MAX];
-    int head, tail;
-} Queue;
-
-void createQueue(Queue &Q);
-bool isEmptyQueue(Queue Q);
-bool isFullQueue(Queue Q);
-void enqueue(Queue &Q, infotype x);
-infotype dequeue(Queue &Q);
-void printInfo(Queue Q);
-
-#endif
-
-```
 #### Output:
-<img width="763" height="264" alt="image" src="https://github.com/user-attachments/assets/decf69d8-970e-40ae-a854-bd09fd4ba60a" />
+
+<img width="736" height="123" alt="image" src="https://github.com/user-attachments/assets/7e0da222-f748-4a13-96c4-b95d0bbaa11a" />
+
+Program ini membangun sebuah Binary Tree sesuai gambar modul dengan membuat struktur `Node` yang memiliki data dan pointer ke anak kiri/kanan. File `tree.h` hanya berisi deklarasi struktur serta fungsi pembuat node dan fungsi traversal. Implementasinya ada di `tree.cpp`, yaitu `newNode()` untuk membuat node baru, serta `preOrder()` dan `postOrder()` untuk mencetak tree secara pre-order (root–left–right) dan post-order (left–right–root). Pada `main.cpp`, pohon dibentuk secara manual dengan menghubungkan node-node sehingga sesuai ilustrasi, lalu program memanggil fungsi traversal untuk menampilkan hasil pre-order dan post-order. Hasil akhirnya: pre-order menghasilkan `6 4 2 1 3 5 7`, dan post-order menghasilkan `1 3 2 5 4 7 6`.
 
 #### Full code Screenshot:
-<img width="1911" height="1132" alt="image" src="https://github.com/user-attachments/assets/8e8fbfa6-6011-4831-80c3-52cfe03c3d6e" />
-<img width="1908" height="1130" alt="image" src="https://github.com/user-attachments/assets/0de2398f-466b-4490-af30-8fa6ac149c76" />
-<img width="1915" height="1137" alt="image" src="https://github.com/user-attachments/assets/91b3a65b-a921-4f4a-a9a9-7e22f4737934" />
+<img width="1909" height="1132" alt="image" src="https://github.com/user-attachments/assets/160e2287-c7c2-4ae8-b451-27b354b1dfbd" />
+<img width="1905" height="1136" alt="image" src="https://github.com/user-attachments/assets/86e9e9e6-e61c-4e69-a9ca-332db89d0d42" />
+<img width="1917" height="1138" alt="image" src="https://github.com/user-attachments/assets/3cad6859-9798-46b6-b81f-f0406d9a9263" />
 
 ## Kesimpulan
-Queue adalah struktur data linear yang menggunakan prinsip FIFO (First In First Out), di mana elemen pertama yang masuk akan keluar lebih dulu. Queue memiliki operasi dasar seperti enqueue (menambah elemen), dequeue (menghapus elemen), serta pengecekan kosong/penuh. Implementasinya bisa berupa head diam – tail bergerak, head dan tail bergerak, atau circular queue, di mana circular queue paling efisien karena memanfaatkan seluruh array tanpa penggeseran. Queue banyak digunakan untuk mengatur antrian dalam sistem nyata seperti printer, buffering data, dan task scheduling.
 
+Rekursif adalah teknik pemrograman yang memecah masalah menjadi versi yang lebih kecil melalui fungsi yang memanggil dirinya sendiri, dengan syarat adanya kondisi berhenti agar proses tidak berjalan tanpa batas. Struktur data tree, khususnya **Binary Search Tree (BST)**, menyimpan data secara hierarkis dengan aturan bahwa nilai lebih kecil berada di kiri dan nilai lebih besar berada di kanan, sehingga operasi seperti pencarian, penyisipan, dan traversal dapat dilakukan secara lebih efisien. Dengan menggabungkan konsep rekursif dan BST, berbagai operasi pada tree dapat dituliskan secara lebih sederhana dan terstruktur.
 
 ## Referensi
-Modul 8 queue
+MODUL 10 TREE (BAGIAN PERTAMA)
