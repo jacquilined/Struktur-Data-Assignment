@@ -1,1407 +1,973 @@
-# <h1 align="center">Laporan Praktikum Modul 13 MULTI LINKED LIST
+# <h1 align="center">Laporan Praktikum Modul 14 Graph
 <p align="center">Nofia Dewi Fitriana  </p>
 
 ## Dasar Teori
-Multi List merupakan sekumpulan list yang berbeda yang memiliki suatu keterhubungan satu sama
-lain. Tiap elemen dalam multi link list dapat membentuk listsendiri.Biasanya ada yang bersifat sebagai list induk dan list anak .
-Contoh Multi Linked list dapat dilihat pada gambar berikut.
-<img width="721" height="501" alt="image" src="https://github.com/user-attachments/assets/75f95d45-49e6-44bf-a67f-9331b53532ea" />
-Jadi , dari implementasi di atas akan terdapat dua buah list, list pegawai dan list anak. Dimana untuk list pegawai menunjuk satu buah list anak. Disini list induknya adalah list pegawai dan list anaknya adalah list anak.
+Graph adalah himpunan dari simpul (node) yang terhubung melalui sambungan (edge). Setiap simpul mewakili entitas atau objek, sedangkan sambungan menggambarkan hubungan atau relasi antara entitas-entitas tersebut.
 
+Fungsi Graph
+
+1. Pencarian Jalur dan Rute
+Memungkinkan kita untuk mencari jalur atau rute terpendek antara dua simpul tertentu. Contohnya adalah ketika menggunakan aplikasi peta untuk menemukan rute tercepat dari titik A ke titik B.
+
+2. Pemodelan Jaringan
+Untuk merepresentasikan jaringan-jaringan kompleks, seperti jaringan sosial di media sosial. Dengan menggunakan struktur data ini, kita dapat menganalisis hubungan antara individu atau entitas dalam jaringan tersebut.
+
+3. Optimisasi
+Dalam beberapa masalah, dapat digunakan untuk mencari solusi optimal, seperti dalam algoritma Travelling Salesman yang mencari rute terpendek yang mengunjungi semua titik yang ada.
+
+Jenis-Jenis Graph
+Graph dapat diklasifikasikan menjadi beberapa jenis berdasarkan sifat dan karakteristiknya:
+
+1. Directed Graph : Pada jenis ini, sambungan antara simpul memiliki arah tertentu. Contohnya, jika ada sambungan dari simpul A ke simpul B, tidak selalu ada sambungan dari simpul B ke simpul A.
+2. Undirected Graph: Jenis ini memiliki sambungan antara simpul tidak memiliki arah. Sambungan antara A dan B dianggap sama dengan sambungan antara B dan A.
+3. Weighted Graph: Memiliki bobot pada setiap sambungan, yang menunjukkan nilai numerik dari hubungan antara simpul-simpul tersebut.
+4. Unweighted Graph: Pada jenis ini, semua sambungan memiliki nilai yang sama tanpa adanya bobot.
+
+   
 ## Guided 
 
-### mll.h
+### graph.h
 
 ```C++
-#ifndef MLL_H
-#define MLL_H
+#ifndef GRAPH_H
+#define GRAPH_H
 
 #include <iostream>
-#include <string>
 
 using namespace std;
 
-struct DataMakanan {
-    string idMakanan;
-    string namaMakanan;
-    float harga;
+typedef char infoGraph;
+typedef struct ElmNode *adrNode;
+typedef struct ElmEdge *adrEdge;
+
+struct ElmNode {
+    infoGraph info; //Menyimpan data node (misal: char/int).
+    int visited; //Penanda untuk traversal (0/1) (Penanda apakah node sudah dikunjungi)
+    adrEdge firstEdge; //Pointer ke edge pertama yang terhubung.
+    adrNode Next; // Pointer ke node berikutnya dalam graph
 };
 
-struct KategoriMakanan {
-    string idKategori;
-    string namaKategori;
+struct ElmEdge {
+    adrNode Node; //Pointer yang menunjuk ke lokasi node tujuan.
+    adrEdge Next; //Pointer ke edge berikutnya (jika satu node memiliki banyak cabang).
 };
 
-typedef struct nodeParent *NodeParent;
-typedef struct nodeChild *NodeChild;
-
-struct nodeChild {
-    DataMakanan isidata;
-    NodeChild next;
-    NodeChild prev;
+struct Graph {
+    adrNode First; //Pointer ke node pertama dalam list graph.
 };
 
-struct listAnak {
-    NodeChild first;
-    NodeChild last;
-};
+void CreateGraph(Graph &G); //prosedur untuk mengeset first dari graph sebagai NOUL
+adrNode AlokasiNode(infoGraph data); //alokasi Node baru
+adrEdge AlokasiEdge(adrNode nodeTujuan); //alokasi Edge baru
 
-struct nodeParent {
-    KategoriMakanan isidata;
-    NodeParent next;
-    NodeParent prev;
-    listAnak L_Anak;
-};
+void InsertNode(Graph &G, infoGraph data); //Menambahkan Node ke dalam Graph
+adrNode FindNode(Graph G, infoGraph data); //function untuk mencari alamat Node berdasarkan infonya
+void ConnectNode(Graph &G, infoGraph info1, infoGraph info2); //prosedur untuk menghubungkan dua Node (Undirected Graph)
+void DisconnectNode(adrNode node1, adrNode node2); //prosedur untuk memutuskan hubungan dua node
+void DeleteNode(Graph &G, infoGraph X); //prosedur untuk menghapus Rode X beserta semua edge yang berhubungan dengannya
 
-struct listInduk {
-    NodeParent first;
-    NodeParent last;
-};
-
-//isEmpty & create list
-bool isEmptyInduk(listInduk LInduk);
-bool isEmptyAnak(listAnak LAnak);
-void createListInduk(listInduk &LInduk);
-void createListAnak(listAnak &LAnak);
-
-//alokasi & dealokasi
-NodeParent alokasiNodeParent(string idKategori, string namaKategori);
-NodeChild alokasiNodeChild(string idMakanan, string namaMakanan, float harga);
-void dealokasiNodeChild(NodeChild &nodeAnak);
-void dealokasiNodeParent(NodeParent &nodeInduk);
-
-//operasi pada parent
-void insertFirstParent(listInduk &LInduk, NodeParent nodeBaruParent);
-void insertLastParent(listInduk &LInduk, NodeParent nodeBaruParent);
-void insertAfterParent(listInduk &LInduk, NodeParent nodeBaruParent, NodeParent nodePrevParent);
-void deleteFirstParent(listInduk &LInduk);
-void deleteLastParent(listInduk &LInduk);
-void deleteAfterParent(listInduk &LInduk, NodeParent nodePrev);
-void findParentByID(listInduk &LInduk, string IDCari);
-void updateDataParentByID(listInduk &LInduk, string IDCari, string newNamaKategori);
-
-//operasi pada child
-void insertFirstChild(listAnak &LAnak, NodeChild nodeBaruChild);
-void insertLastChild(listAnak &LAnak, NodeChild nodeBaruChild);
-void insertAfterChild(listAnak &LAnak, NodeChild nodeBaruChild, NodeChild nodePrevChild);
-void deleteFirstChild(listAnak &LAnak);
-void deleteLastChild(listAnak &LAnak);
-void deleteAfterChild(listAnak &LAnak, NodeChild nodePrev);
-void findChildByID(listInduk &LInduk, string IDCari);
-void updateDataChildByID(listInduk &LInduk, string IDCari, string newNamaMakanan, float newHarga);
-
-//operasi print
-void printStrukturMLL(listInduk &LInduk);
-void printListInduk(listInduk &LInduk);
-void printListAnak(listInduk &LInduk, NodeParent nodeInduk);
-
-//operasi hapus list
-void hapusListInduk(listInduk &LInduk);
-void hapusListAnak(listAnak &LAnak);
+void PrintInfoGraph(Graph G); //Menampilkan isi Graph (Adjacency List)
+void ResetVisited(Graph &G); //Reset status visited sebelum traversal
+void PrintBFS(Graph G, infoGraph StartInfo); //traversal Breadth First Search / BFS (Menggunakan Queue)
+void PrintDFS(Graph G, infoGraph StartInfo); //Traversal Depth First Search / DFS (Menggunakan Stack)
 
 #endif
-
 ```
 
-### mll.cpp
+### graph.cpp
 
 ```C++
-#include "mll.h"
+#include "graph.h"
 #include <iostream>
-#include <string>
+#include <queue> //library queue untuk BFS
+#include <stack> //library stack untuk DFS
 
 using namespace std;
 
-//isEmpty & create list
-bool isEmptyInduk(listInduk LInduk){
-    if(LInduk.first == NULL){
-        return true;
+//prosedur untuk mengeset first dari graph sebagai NULL
+void CreateGraph(Graph &G) {
+    G.First = NULL;
+}
+
+//alokasi Node baru
+adrNode AlokasiNode(infoGraph data) {
+    adrNode nodeBaru = new ElmNode;
+    nodeBaru->info = data;
+    nodeBaru->visited = 0; //isinya 0/1
+    nodeBaru->firstEdge = NULL;
+    nodeBaru->Next = NULL;
+    return nodeBaru;
+}
+
+//alokasi Edge baru
+adrEdge AlokasiEdge(adrNode nodeTujuan) {
+    adrEdge edgeBaru = new ElmEdge;
+    edgeBaru->Node = nodeTujuan;
+    edgeBaru->Next = NULL;
+    return edgeBaru;
+}
+
+//Menambahkan Node ke dalam Graph
+void InsertNode(Graph &G, infoGraph data) {
+    adrNode nodeBaru = AlokasiNode(data);
+    if (G.First == NULL) {
+        G.First = nodeBaru;
     } else {
-        return false;
-    }
-}
-
-bool isEmptyAnak(listAnak LAnak){
-    if(LAnak.first == NULL){
-        return true;
-    } else {
-        return false;
-    }
-}
-
-void createListInduk(listInduk &LInduk) {
-    LInduk.first = LInduk.last = NULL;
-}
-
-void createListAnak(listAnak &LAnak) {
-    LAnak.first = LAnak.last = NULL;
-}
-
-//alokasi & dealokasi
-NodeParent alokasiNodeParent(string idKategori, string namaKategori) {
-    NodeParent nodeBaruParent = new nodeParent;
-    nodeBaruParent->isidata.idKategori = idKategori;
-    nodeBaruParent->isidata.namaKategori = namaKategori;
-    nodeBaruParent->next = NULL;
-    nodeBaruParent->prev = NULL;
-    createListAnak(nodeBaruParent->L_Anak);
-    return nodeBaruParent;
-}
-
-NodeChild alokasiNodeChild(string idMakanan, string namaMakanan, float harga) {
-    NodeChild nodeBaruChild = new nodeChild;
-    nodeBaruChild->isidata.idMakanan = idMakanan;
-    nodeBaruChild->isidata.namaMakanan = namaMakanan;
-    nodeBaruChild->isidata.harga = harga;
-    nodeBaruChild->next = NULL;
-    nodeBaruChild->prev = NULL;
-    return nodeBaruChild;
-}
-
-void dealokasiNodeChild(NodeChild &nodeAnak) {
-    if(nodeAnak != NULL) {
-        nodeAnak->next = nodeAnak->prev = NULL;
-        delete nodeAnak;
-        nodeAnak = NULL;
-    }
-}
-
-void dealokasiNodeParent(NodeParent &nodeInduk) {
-    if(nodeInduk != NULL) {
-        nodeInduk->next = nodeInduk->prev = NULL;
-        delete nodeInduk;
-        nodeInduk = NULL;
-    }
-}
-
-//operasi pada parent
-void insertFirstParent(listInduk &LInduk, NodeParent nodeBaruParent) {
-    if(isEmptyInduk(LInduk) == true) {
-        LInduk.first = LInduk.last = nodeBaruParent;
-    } else {
-        nodeBaruParent->next = LInduk.first;
-        LInduk.first->prev = nodeBaruParent;
-        LInduk.first = nodeBaruParent;
-    }
-    cout << "Node parent "<< nodeBaruParent->isidata.namaKategori << " berhasil ditambahkan kedalam urutan pertama di list Induk!" << endl;
-}
-
-void insertLastParent(listInduk &LInduk, NodeParent nodeBaruParent) {
-    if(isEmptyInduk(LInduk) == true) {
-        LInduk.first = LInduk.last = nodeBaruParent;
-    } else {
-        nodeBaruParent->prev = LInduk.last;
-        LInduk.last->next = nodeBaruParent;
-        LInduk.last = nodeBaruParent;
-    }
-    cout << "Node parent "<< nodeBaruParent->isidata.namaKategori << " berhasil ditambahkan kedalam urutan terakhir di list Induk!" << endl;
-}
-
-void insertAfterParent(listInduk &LInduk, NodeParent nodeBaruParent, NodeParent nodePrevParent) {
-    if(nodePrevParent == NULL) {
-        cout << "Node Prev Parent tidak valid!" << endl;
-    } else {
-        if(nodePrevParent == LInduk.last){
-            insertLastParent(LInduk, nodeBaruParent);
-            return;
-        } else {
-            nodeBaruParent->next = nodePrevParent->next;
-            nodeBaruParent->prev = nodePrevParent;
-            (nodePrevParent->next)->prev = nodeBaruParent;
-            nodePrevParent->next = nodeBaruParent;
-            cout << "Node parent "<< nodeBaruParent->isidata.namaKategori << " berhasil ditambahkan kedalam list induk setelah node parent "<< nodePrevParent->isidata.namaKategori << endl;
+        //konsepnya insert last
+        adrNode nodeBantu = G.First;
+        while (nodeBantu->Next != NULL) {
+            nodeBantu = nodeBantu->Next;
         }
+        nodeBantu->Next = nodeBaru;
     }
 }
 
-void deleteFirstParent(listInduk &LInduk){
-    if(isEmptyInduk(LInduk) == true){
-        cout << "List Induk kosong!" << endl;
+//function untuk mencari alamat Node berdasarkan infonya
+adrNode FindNode(Graph G, infoGraph data) {
+    adrNode nodeBantu = G.First;
+    while (nodeBantu != NULL) {
+        if (nodeBantu->info == data) {
+            return nodeBantu;
+        }
+        nodeBantu = nodeBantu->Next;
+    }
+    return NULL;
+}
+
+//prosedur untuk menghubungkan dua Node (Undirected Graph)
+void ConnectNode(Graph &G, infoGraph info1, infoGraph info2) {
+    adrNode node1 = FindNode(G, info1);
+    adrNode node2 = FindNode(G, info2);
+
+    if (node1 != NULL && node2 != NULL) {
+        //Hubungkan node1 ke node2
+        adrEdge Edge1 = AlokasiEdge(node2);
+        Edge1->Next = node1->firstEdge; // Insert First pada list edge
+        node1->firstEdge = Edge1;
+
+        //Hubungkan node2 ke node1 (Karena Undirected/Bolak-balik)
+        adrEdge Edge2 = AlokasiEdge(node1);
+        Edge2->Next = node2->firstEdge;
+        node2->firstEdge = Edge2;
     } else {
-        NodeParent nodeHapus = LInduk.first;
-        if (LInduk.first == LInduk.last) { // KASUS KHUSUS 1 ELEMEN
-            LInduk.first = NULL;
-            LInduk.last = NULL;
-        } else {
-            LInduk.first = LInduk.first->next;
-            LInduk.first->prev = NULL;
-            nodeHapus->next = NULL;
-        }
-        if(nodeHapus->L_Anak.first != NULL){
-            hapusListAnak(nodeHapus->L_Anak);
-        }
-        dealokasiNodeParent(nodeHapus);
-        cout << "Node pertama list induk berhasil dihapus beserta anak-anaknya!" << endl;
+        cout << "Node tidak ditemukan!" << endl;
     }
 }
 
-void deleteLastParent(listInduk &LInduk){
-    if(isEmptyInduk(LInduk) == true){
-        cout << "List Induk kosong!" << endl;
-    } else {
-        NodeParent nodeHapus = LInduk.last;
-        if (LInduk.first == LInduk.last) {
-            LInduk.first = NULL;
-            LInduk.last = NULL;
-        } else {
-            LInduk.last = LInduk.last->prev;
-            nodeHapus->prev = NULL;
-            LInduk.last->next = NULL;
-        }
-        if(nodeHapus->L_Anak.first != NULL){
-            hapusListAnak(nodeHapus->L_Anak);
-        }
-        dealokasiNodeParent(nodeHapus);
-        cout << "Node terakhir list induk berhasil dihapus beserta anak-anaknya!" << endl;
-    }
-}
+//prosedur untuk memutuskan hubungan dua node
+void DisconnectNode(adrNode node1, adrNode node2) {
+    if (node1 != NULL && node2 != NULL) {
+        adrEdge edgeBantu = node1->firstEdge;
+        adrEdge PrevE = NULL;
 
-void deleteAfterParent(listInduk &LInduk, NodeParent nodePrev){
-    if(isEmptyInduk(LInduk) == true){
-        cout << "List induk kosong!" << endl;
-    } else {
-        if(nodePrev != NULL && nodePrev->next != NULL){
-            NodeParent nodeHapus = nodePrev->next;
-            nodePrev->next = nodeHapus->next;
-            if (nodeHapus->next != NULL){
-                (nodeHapus->next)->prev = nodePrev;
+        //Cari edge yang mengarah ke node2 di dalam list milik node1
+        while (edgeBantu != NULL && edgeBantu->Node != node2) {
+            PrevE = edgeBantu;
+            edgeBantu = edgeBantu->Next;
+        }
+
+        if (edgeBantu != NULL) { //jika Edge ditemukan
+            if (PrevE == NULL) {
+                //Hapus edge pertama
+                node1->firstEdge = edgeBantu->Next;
             } else {
-                LInduk.last = nodePrev;
+                //Hapus edge di tengah/akhir
+                PrevE->Next = edgeBantu->Next;
             }
-            nodeHapus->next = NULL;
-            if(nodeHapus->L_Anak.first != NULL){
-                hapusListAnak(nodeHapus->L_Anak);
+            delete edgeBantu;
+        }
+    }
+}
+
+//prosedur untuk menghapus Node X beserta semua edge yang berhubungan dengannya
+void DeleteNode(Graph &G, infoGraph X) {
+    //1. Cari Node yang akan dihapus (nodeHapus)
+    adrNode nodeHapus = FindNode(G, X);
+    if (nodeHapus == NULL) {
+        cout << "Node tidak ditemukan." << endl;
+        return;
+    }
+
+    //2. Hapus semua Edge yang MENGARAH ke nodeHapus (Incoming Edges)
+    //cek setiap node di graph, apakah punya edge ke nodeHapus
+    adrNode nodeLainnya = G.First;
+    while (nodeLainnya != NULL) {
+        DisconnectNode(nodeLainnya, nodeHapus); //putus hubungan nodeLainnya ke nodeHapus
+        nodeLainnya = nodeLainnya->Next;
+    }
+
+    //3. Hapus semua Edge yang KELUAR dari nodeHapus (Outgoing Edges)
+    //Deallokasi list edge milik nodeHapus
+    adrEdge edgeBantu = nodeHapus->firstEdge;
+    while (edgeBantu != NULL) {
+        adrEdge tempE = edgeBantu;
+        edgeBantu = edgeBantu->Next;
+        delete tempE;
+    }
+    nodeHapus->firstEdge = NULL;
+
+    //4. Hapus nodeHapus dari List Utama Graph
+    if (G.First == nodeHapus) {
+        //jika nodeHapus di awal
+        G.First = nodeHapus->Next;
+    } else {
+        //jika nodeHapus di tengah/akhir
+        adrNode nodeBantu = G.First;
+        while (nodeBantu->Next != nodeHapus) {
+            nodeBantu = nodeBantu->Next;
+        }
+        nodeBantu->Next = nodeHapus->Next;
+    }
+
+    //5. delete nodeHapus
+    delete nodeHapus;
+}
+
+//Menampilkan isi Graph (Adjacency List) 
+void PrintInfoGraph(Graph G) {
+    adrNode nodeBantu = G.First;
+    while (nodeBantu != NULL) {
+        cout << "Node " << nodeBantu->info << " terhubung ke: ";
+        adrEdge edgeBantu = nodeBantu->firstEdge;
+        while (edgeBantu != NULL) {
+            cout << edgeBantu->Node->info << " "; //Akses info dari node tujuan
+            edgeBantu = edgeBantu->Next;
+        }
+        cout << endl;
+        nodeBantu = nodeBantu->Next;
+    }
+}
+
+//Reset status visited sebelum traversal
+void ResetVisited(Graph &G) {
+    adrNode nodeReset = G.First;
+    while (nodeReset != NULL) {
+        nodeReset->visited = 0;
+        nodeReset = nodeReset->Next;
+    }
+}
+
+//traversal Breadth First Search / BFS (Menggunakan Queue)
+void PrintBFS(Graph G, infoGraph StartInfo) {
+    ResetVisited(G);
+    adrNode StartNode = FindNode(G, StartInfo);
+    
+    if (StartNode == NULL) return;
+
+    queue<adrNode> Qyu;
+    
+    //Enqueue start
+    Qyu.push(StartNode);
+    StartNode->visited = 1;
+
+    cout << "BFS Traversal: ";
+    while (!Qyu.empty()) {
+        adrNode nodeBantu = Qyu.front();
+        Qyu.pop();
+        cout << nodeBantu->info << " - ";
+
+        //Cek semua tetangga atau edge nya
+        adrEdge edgeBantu = nodeBantu->firstEdge;
+        while (edgeBantu != NULL) {
+            if (edgeBantu->Node->visited == 0) {
+                edgeBantu->Node->visited = 1;
+                Qyu.push(edgeBantu->Node);
             }
-            dealokasiNodeParent(nodeHapus);
-            cout << "Node parent setelah node " << nodePrev->isidata.namaKategori << " berhasil dihapus beserta anak-anaknya!" << endl;
-        } else {
-            cout << "Node prev tidak valid!" << endl;
+            edgeBantu = edgeBantu->Next;
         }
     }
+    cout << endl;
 }
 
-void findParentByID(listInduk &LInduk, string IDCari){
-    if(isEmptyInduk(LInduk) == true){
-        cout << "List induk kosong!" << endl;
-    } else {
-        NodeParent nodeBantu = LInduk.first;
-        int index = 1;
-        int ketemu = false;
-        while(nodeBantu != NULL){
-            if(nodeBantu->isidata.idKategori == IDCari){
-                cout << "Data ID parent ditemukan pada list induk posisi ke-" << index << "!" << endl;
-                cout << "ID : " << nodeBantu->isidata.idKategori << endl;
-                cout << "Posisi dalam list induk : posisi ke-" << index << endl;
-                cout << "Nama Kategori : " << nodeBantu->isidata.namaKategori << endl;
-                ketemu = true;
-                break;
-            } else {
-                nodeBantu = nodeBantu->next;
-                index++;
-            }
-        }
-        if(!ketemu){
-            cout << "Data ID parent tidak ditemukan didalam list induk!" << endl;
-        }
-    }
-}
+//Traversal Depth First Search / DFS (Menggunakan Stack)
+void PrintDFS(Graph G, infoGraph StartInfo) {
+    ResetVisited(G);
+    adrNode StartNode = FindNode(G, StartInfo);
+    
+    if (StartNode == NULL) return;
 
-void updateDataParentByID(listInduk &LInduk, string IDCari, string newNamaKategori) {
-    if (isEmptyInduk(LInduk) == true) {
-        cout << "List Induk kosong!" << endl;
-    } else {
-        NodeParent nodeBantu = LInduk.first;
-        bool ketemu = false;
-        while (nodeBantu != NULL) {
-            if (nodeBantu->isidata.idKategori == IDCari) {
-                // Proses Update
-                nodeBantu->isidata.namaKategori = newNamaKategori;
-                cout << "Update Parent Berhasil!" << endl;
-                cout << "Node parent dengan ID " << IDCari << " berhasil diupdate menjadi : " << endl;
-                cout << "Nama Kategori baru  : " << newNamaKategori << endl;
-                ketemu = true;
-                break; 
-            } else {
-                nodeBantu = nodeBantu->next;
-            }
-        }
-        if (!ketemu) {
-            cout << "Parent dengan ID " << IDCari << " tidak ditemukan" << endl;
-        }
-    }
-}
+    stack<adrNode> Stak;
+    
+    Stak.push(StartNode);
 
-//operasi pada child
-void insertFirstChild(listAnak &LAnak, NodeChild nodeBaruChild) {
-    if(isEmptyAnak(LAnak)) {
-        LAnak.first = LAnak.last = nodeBaruChild;
-    } else {
-        nodeBaruChild->next = LAnak.first;
-        LAnak.first->prev = nodeBaruChild;
-        LAnak.first = nodeBaruChild;
-    }
-    cout << "Node child "<< nodeBaruChild->isidata.namaMakanan << " berhasil ditambahkan kedalam urutan pertama di list Anak!" << endl;
-}
+    cout << "DFS Traversal: ";
+    while (!Stak.empty()) {
+        adrNode nodeBantu = Stak.top();
+        Stak.pop();
 
-void insertLastChild(listAnak &LAnak, NodeChild nodeBaruChild) {
-    if(isEmptyAnak(LAnak)) {
-        LAnak.first = LAnak.last = nodeBaruChild;
-    } else {
-        nodeBaruChild->prev = LAnak.last;
-        LAnak.last->next = nodeBaruChild;
-        LAnak.last = nodeBaruChild;
-    }
-    cout << "Node child "<< nodeBaruChild->isidata.namaMakanan << " berhasil ditambahkan kedalam urutan terakhir di list Anak!" << endl;
-}
+        if (nodeBantu->visited == 0) {
+            nodeBantu->visited = 1;
+            cout << nodeBantu->info << " - ";
 
-void insertAfterChild(listAnak &LAnak, NodeChild nodeBaruChild, NodeChild nodePrevChild) {
-    if(nodePrevChild == NULL) {
-        cout << "Node Prev Parent tidak valid!" << endl;
-    } else {
-        if(nodePrevChild == LAnak.last){
-            insertLastChild(LAnak, nodeBaruChild);
-            return;
-        } else {
-            nodeBaruChild->next = nodePrevChild->next;
-            nodeBaruChild->prev = nodePrevChild;
-            (nodePrevChild->next)->prev = nodeBaruChild;
-            nodePrevChild->next = nodeBaruChild;
-            cout << "Node child "<< nodeBaruChild->isidata.namaMakanan << " berhasil ditambahkan kedalam list anak setelah node child "<< nodePrevChild->isidata.namaMakanan << endl;
-        }
-    }
-}
-
-void deleteFirstChild(listAnak &LAnak){
-    if(isEmptyAnak(LAnak) == true){
-        cout << "List anak kosong!" << endl;
-    } else {
-        NodeChild nodeHapus = LAnak.first;
-        if (LAnak.first == LAnak.last) { // KASUS KHUSUS 1 ELEMEN
-            LAnak.first = NULL;
-            LAnak.last = NULL;
-        } else {
-            LAnak.first = LAnak.first->next;
-            LAnak.first->prev = NULL;
-            nodeHapus->next = NULL;
-        }
-        dealokasiNodeChild(nodeHapus);
-        cout << "Node pertama list anak berhasil dihapus!" << endl;
-    }
-}
-
-void deleteLastChild(listAnak &LAnak){
-    if(isEmptyAnak(LAnak) == true){
-        cout << "List anak kosong!" << endl;
-    } else {
-        NodeChild nodeHapus = LAnak.last;
-        if (LAnak.first == LAnak.last) {
-            LAnak.first = NULL;
-            LAnak.last = NULL;
-        } else {
-            LAnak.last = LAnak.last->prev;
-            nodeHapus->prev = NULL;
-            LAnak.last->next = NULL;
-        }
-        dealokasiNodeChild(nodeHapus);
-        cout << "Node terakhir list anak berhasil dihapus!" << endl;
-    }
-}
-
-void deleteAfterChild(listAnak &LAnak, NodeChild nodePrev){
-    if(isEmptyAnak(LAnak) == true){
-        cout << "List induk kosong!" << endl;
-    } else {
-        if(nodePrev != NULL && nodePrev->next != NULL){
-            NodeChild nodeHapus = nodePrev->next;
-            nodePrev->next = nodeHapus->next;
-            if (nodeHapus->next != NULL){
-                (nodeHapus->next)->prev = nodePrev;
-            } else {
-                LAnak.last = nodePrev;
-            }
-            nodeHapus->next = NULL;
-            dealokasiNodeChild(nodeHapus);
-            cout << "Node child setelah node " << nodePrev->isidata.namaMakanan << " berhasil dihapus!" << endl;
-        } else {
-            cout << "Node prev tidak valid!" << endl;
-        }
-    }
-}
-
-void findChildByID(listInduk &LInduk, string IDCari){
-    if(isEmptyInduk(LInduk) == true){
-        cout << "List induk kosong!" << endl;
-    } else {
-        NodeParent nodeBantuParent = LInduk.first;
-        int indexParent = 1;
-        int ketemu = false;
-        while(nodeBantuParent != NULL){
-            NodeChild nodeBantuChild = nodeBantuParent->L_Anak.first;
-            int indexChild = 1;
-            while(nodeBantuChild != NULL){
-                if(nodeBantuChild->isidata.idMakanan == IDCari) {
-                    cout << "Data ID child ditemukan pada list anak dari node parent " << nodeBantuParent->isidata.namaKategori << " pada posisi ke-" << indexChild << "!" << endl;
-                    cout << "--- Data Child ---" << endl;
-                    cout << "ID Child : " << nodeBantuChild->isidata.idMakanan << endl;
-                    cout << "Posisi dalam list anak : posisi ke-" << indexChild << endl;
-                    cout << "Nama Makanan : " << nodeBantuChild->isidata.namaMakanan << endl;
-                    cout << "Harga : " << nodeBantuChild->isidata.harga << endl;
-                    cout << "---------------------------" << endl;
-                    cout << "--- Data Parent ---" << endl;
-                    cout << "ID Parent : " << nodeBantuParent->isidata.idKategori << endl;
-                    cout << "Posisi dalam list induk : posisi ke-" << indexParent << endl;
-                    cout << "Nama kategori : " << nodeBantuParent->isidata.namaKategori << endl;
-                    ketemu = true;
-                    break;
-                } else {
-                    nodeBantuChild = nodeBantuChild->next;
-                    indexChild++;
+            //masukkan tetangga ke stack
+            adrEdge edgeBantu = nodeBantu->firstEdge;
+            while (edgeBantu != NULL) {
+                if (edgeBantu->Node->visited == 0) {
+                    Stak.push(edgeBantu->Node);
                 }
-            }
-            if(ketemu){
-                break;
-            } else {
-                nodeBantuParent = nodeBantuParent->next;
-                indexParent++;
-            }
-        }
-        if(!ketemu){
-            cout << "Data ID child tidak ditemukan didalam list anak!" << endl;
-        }
-    }
-}
-
-void updateDataChildByID(listInduk &LInduk, string IDCari, string newNamaMakanan, float newHarga) {
-    if (isEmptyInduk(LInduk) == true) {
-        cout << "List Induk kosong!" << endl;
-    } else {
-        NodeParent nodeBantuParent = LInduk.first;
-        bool ketemu = false;
-        // Loop Parent (karena child ada di dalam parent)
-        while (nodeBantuParent != NULL) {
-            NodeChild nodeBantuChild = nodeBantuParent->L_Anak.first;
-            // Loop Child
-            while (nodeBantuChild != NULL) {
-                if (nodeBantuChild->isidata.idMakanan == IDCari) {
-                    // Proses Update
-                    nodeBantuChild->isidata.namaMakanan = newNamaMakanan;
-                    nodeBantuChild->isidata.harga = newHarga;
-                    cout << "Update Child Berhasil!" << endl;
-                    cout << "Lokasi : Ada di dalam Parent " << nodeBantuParent->isidata.namaKategori << endl;
-                    cout << "Node child dengan ID " << IDCari << " berhasil diupdate menjadi : " << endl;
-                    cout << "Nama Makanan Baru  : " << newNamaMakanan << endl;
-                    cout << "Harga Baru : " << newHarga << endl;
-                    ketemu = true;
-                    break; // Break loop child
-                } else {
-                    nodeBantuChild = nodeBantuChild->next;
-                }
-            }
-            if (ketemu){
-                break; // Break loop parent jika sudah ketemu di dalam
-            } else {
-                nodeBantuParent = nodeBantuParent->next;
-            }
-        }
-        if (!ketemu) {
-            cout << "Child dengan ID " << IDCari << " tidak ditemukan di parent manapun." << endl;
-        }
-    }
-}
-
-//operasi print
-void printStrukturMLL(listInduk &LInduk) {
-    if(isEmptyInduk(LInduk)) {
-        cout << "List induk kosong!" << endl;
-    } else {
-        NodeParent nodeBantuParent = LInduk.first;
-        int indexParent = 1;
-        while(nodeBantuParent != NULL) {
-            cout << "=== Parent " << indexParent << " ===" << endl;
-            cout << "ID Kategori : " << nodeBantuParent->isidata.idKategori << endl;
-            cout << "Nama Kategori : " << nodeBantuParent->isidata.namaKategori << endl;
-
-            //print list anak dari node parentnya
-            NodeChild nodeBantuChild = nodeBantuParent->L_Anak.first;
-            if(nodeBantuChild == NULL) {
-                cout << "  (tidak ada child)" << endl;
-            } else {
-                int indexChild = 1;
-                while(nodeBantuChild != NULL) {
-                    cout << "  - Child " << indexChild << " :" << endl;
-                    cout << "      ID Makanan : " << nodeBantuChild->isidata.idMakanan << endl;
-                    cout << "      Nama Makanan : " << nodeBantuChild->isidata.namaMakanan << endl;
-                    cout << "      Harga : " << nodeBantuChild->isidata.harga << endl;
-                    nodeBantuChild = nodeBantuChild->next;
-                    indexChild++;
-                }
-            }
-            cout << "---------------------------" << endl;
-            nodeBantuParent = nodeBantuParent->next;
-            indexParent++;
-        }
-    }
-}
-
-void printListInduk(listInduk &LInduk) {
-    if(isEmptyInduk(LInduk)) {
-        cout << "List induk Kosong!" << endl;
-    } else {
-        NodeParent nodeBantuParent = LInduk.first;
-        int index = 1;
-        while(nodeBantuParent != NULL) {
-            cout << "=== Parent " << index << " ===" << endl;
-            cout << "ID Kategori : " << nodeBantuParent->isidata.idKategori << endl;
-            cout << "Nama Kategori : " << nodeBantuParent->isidata.namaKategori << endl;
-            cout << "---------------------------" << endl;
-            nodeBantuParent = nodeBantuParent->next;
-            index++;
-        }
-    }
-}
-
-void printListAnak(listInduk &LInduk, NodeParent nodeInduk) {
-    if(isEmptyInduk(LInduk) == true || nodeInduk == NULL){
-        cout << "List induk kosong atau node induk tidak valid!" << endl;
-    } else {
-        NodeChild nodeBantuChild = nodeInduk->L_Anak.first;
-        if(nodeBantuChild == NULL) {
-            cout << "node parent " << nodeInduk->isidata.namaKategori << " tidak memiliki list anak!" << endl;
-        } else {
-            cout << "=== List Anak Node Parent " << nodeInduk->isidata.namaKategori << " ===" << endl;
-            int index = 1;
-            while(nodeBantuChild != NULL) {
-                cout << "Child " << index << " :" << endl;
-                cout << "ID Makanan : " << nodeBantuChild->isidata.idMakanan << endl;
-                cout << "Nama Makanan : " << nodeBantuChild->isidata.namaMakanan << endl;
-                cout << "Harga : " << nodeBantuChild->isidata.harga << endl;
-                cout << "---------------------------" << endl;
-                nodeBantuChild = nodeBantuChild->next;
-                index++;
+                edgeBantu = edgeBantu->Next;
             }
         }
     }
-}
-
-//operasi hapus list
-void hapusListInduk(listInduk &LInduk) {
-    NodeParent nodeBantu = LInduk.first;
-    while(nodeBantu != NULL) {
-        NodeParent nodeHapus = nodeBantu;
-        nodeBantu = nodeBantu->next;
-        //panggil prosedur hapusListAnak() untuk menghapus child-child nya
-        hapusListAnak(nodeHapus->L_Anak);
-        dealokasiNodeParent(nodeHapus);
-    }
-    LInduk.first = LInduk.last = NULL;
-}
-
-void hapusListAnak(listAnak &LAnak) {
-    NodeChild nodeBantu = LAnak.first;
-    while(nodeBantu != NULL) {
-        NodeChild nodeHapus = nodeBantu;
-        nodeBantu = nodeBantu->next;
-        dealokasiNodeChild(nodeHapus);
-    }
-    LAnak.first = LAnak.last = NULL;
+    cout << endl;
 }
 ```
 
 ### main.cpp
 
 ```C++
+#include "graph.h"
 #include <iostream>
-#include "bstree.h"
+#include <queue> //library queue untuk BFS
+#include <stack> //library stack untuk DFS
+
 using namespace std;
 
 int main() {
-    cout << "Hello world!" << endl;
+    Graph G;
+    CreateGraph(G);
 
-    address root = NULL;
+    InsertNode(G, 'A');
+    InsertNode(G, 'B');
+    InsertNode(G, 'C');
+    InsertNode(G, 'D');
+    InsertNode(G, 'E');
+    InsertNode(G, 'F');
 
-    // insert nodes
-    insertNode(root, 1);
-    insertNode(root, 2);
-    insertNode(root, 6);
-    insertNode(root, 4);
-    insertNode(root, 5);
-    insertNode(root, 3);
-    insertNode(root, 0);
-    insertNode(root, 7);
+    //hubungkan antar node
+    ConnectNode(G, 'A', 'B');
+    ConnectNode(G, 'A', 'D');
+    ConnectNode(G, 'B', 'C');
+    ConnectNode(G, 'D', 'C');
+    ConnectNode(G, 'B', 'E');
+    ConnectNode(G, 'C', 'E');
+    ConnectNode(G, 'C', 'F');
+    ConnectNode(G, 'E', 'F');
 
-    // print in-order
-    inOrder(root);
+    cout << "=== REPRESENTASI ADJACENCY LIST ===" << endl;
+    PrintInfoGraph(G);
     cout << endl;
 
-    // menahan console seperti CodeBlocks
-    system("pause");
+    cout << "=== HASIL TRAVERSAL ===" << endl;
+    //mulai traversal dari node A
+    PrintBFS(G, 'A'); //BFS
+    PrintDFS(G, 'A'); //DFS
+    cout << endl;
+
+    cout << "=== HAPUS NODE E ===" << endl;
+    DeleteNode(G, 'E');
+    if(FindNode(G, 'E') == NULL){
+        cout << "Node E berhasil terhapus" << endl;
+    } else {
+        cout << "Node E tidak berhasil terhapus" << endl;
+    }
+    cout << endl;
+
+    cout << "=== REPRESENTASI ADJACENCY LIST ===" << endl;
+    PrintInfoGraph(G);
+    cout << endl;
+
+    cout << "=== HASIL TRAVERSAL ===" << endl;
+    //mulai traversal dari node A
+    PrintBFS(G, 'A'); //BFS
+    PrintDFS(G, 'A'); //DFS
 
     return 0;
 }
-
 ```
 
 ## Unguided 
-<img width="991" height="70" alt="image" src="https://github.com/user-attachments/assets/7f39ca69-b9bd-4365-aa88-f420dfdd2970" />
+<img width="901" height="827" alt="image" src="https://github.com/user-attachments/assets/ae0dd413-88d7-4b89-8744-b59848745353" />
 
 
-### multilist.cpp
+### graph1.h
 
 ```C++
-#ifndef MULTILIST_H_INCLUDED
-#define MULTILIST_H_INCLUDED
+#ifndef GRAPH_H
+#define GRAPH_H
 
 #include <iostream>
 using namespace std;
 
-#define Nil NULL
-typedef bool boolean;
+typedef char infoGraph;
 
-typedef int infotypeanak;
-typedef int infotypeinduk;
+struct ElmNode;
+struct ElmEdge;
 
-typedef struct elemen_list_induk *address;
-typedef struct elemen_list_anak *address_anak;
+typedef ElmNode* adrNode;
+typedef ElmEdge* adrEdge;
 
-struct elemen_list_anak {
-    infotypeanak info;
-    address_anak next;
-    address_anak prev;
+struct ElmEdge {
+    adrNode node;
+    adrEdge next;
 };
 
-struct listanak {
-    address_anak first;
-    address_anak last;
+struct ElmNode {
+    infoGraph info;
+    int visited;
+    adrEdge firstEdge;
+    adrNode next;
 };
 
-struct elemen_list_induk {
-    infotypeinduk info;
-    listanak lanak;
-    address next;
-    address prev;
+struct Graph {
+    adrNode first;
 };
 
-struct listinduk {
-    address first;
-    address last;
-};
+void CreateGraph(Graph &G);
+adrNode InsertNode(Graph &G, infoGraph X);
+void ConnectNode(Graph &G, adrNode N1, adrNode N2);
 
-boolean ListEmpty(listinduk L);
-boolean ListEmptyAnak(listanak L);
-
-void CreateList(listinduk &L);
-void CreateListAnak(listanak &L);
-
-address alokasi(infotypeinduk P);
-address_anak alokasiAnak(infotypeanak P);
-
-void dealokasi(address P);
-void dealokasiAnak(address_anak P);
-
-address findElm(listinduk L, infotypeinduk X);
-address_anak findElm(listanak Lanak, infotypeanak X);
-
-boolean fFindElm(listinduk L, address P);
-boolean fFindElmanak(listanak Lanak, address_anak P);
-
-address findBefore(listinduk L, address P);
-
-void insertFirst(listinduk &L, address P);
-void insertAfter(listinduk &L, address P, address Prec);
-void insertLast(listinduk &L, address P);
-
-void insertFirstAnak(listanak &L, address_anak P);
-void insertAfterAnak(listanak &L, address_anak P, address_anak Prec);
-void insertLastAnak(listanak &L, address_anak P);
-
-void delFirst(listinduk &L, address &P);
-void delLast(listinduk &L, address &P);
-void delAfter(listinduk &L, address &P, address Prec);
-void delP(listinduk &L, infotypeinduk X);
-
-void delFirstAnak(listanak &L, address_anak &P);
-void delLastAnak(listanak &L, address_anak &P);
-void delAfterAnak(listanak &L, address_anak &P, address_anak Prec);
-void delPAnak(listanak &L, infotypeanak X);
-
-void printInfoInduk(listinduk L);
-void printInfoAnak(listanak Lanak);
-
-int nbListInduk(listinduk L);
-int nbListAnak(listanak Lanak);
-
-void delAll(listinduk &L);
+void PrintGraphASCII();
 
 #endif
-
 ```
-### multilist.cpp
+### graph1.cpp
 
 ```C++
-#include "multilist.h"
-#include <iostream>
-using namespace std;
+#include "graph1.h"
 
-boolean ListEmpty(listinduk L) {
-    return (L.first == Nil && L.last == Nil);
+static adrNode newNode(infoGraph x) {
+    adrNode p = new ElmNode;
+    p->info = x;
+    p->visited = 0;
+    p->firstEdge = nullptr;
+    p->next = nullptr;
+    return p;
 }
 
-boolean ListEmptyAnak(listanak L) {
-    return (L.first == Nil && L.last == Nil);
+static adrEdge newEdge(adrNode dest) {
+    adrEdge e = new ElmEdge;
+    e->node = dest;
+    e->next = nullptr;
+    return e;
 }
 
-void CreateList(listinduk &L) {
-    L.first = Nil;
-    L.last = Nil;
-}
-
-void CreateListAnak(listanak &L) {
-    L.first = Nil;
-    L.last = Nil;
-}
-
-address alokasi(infotypeinduk x) {
-    address P = new elemen_list_induk;
-    P->info = x;
-    CreateListAnak(P->lanak);
-    P->next = Nil;
-    P->prev = Nil;
-    return P;
-}
-
-address_anak alokasiAnak(infotypeanak x) {
-    address_anak P = new elemen_list_anak;
-    P->info = x;
-    P->next = Nil;
-    P->prev = Nil;
-    return P;
-}
-
-void dealokasi(address P) {
-    delete P;
-}
-
-void dealokasiAnak(address_anak P) {
-    delete P;
-}
-
-address findElm(listinduk L, infotypeinduk X) {
-    address P = L.first;
-    while (P != Nil) {
-        if (P->info == X) return P;
-        P = P->next;
-    }
-    return Nil;
-}
-
-address_anak findElm(listanak L, infotypeanak X) {
-    address_anak P = L.first;
-    while (P != Nil) {
-        if (P->info == X) return P;
-        P = P->next;
-    }
-    return Nil;
-}
-
-boolean fFindElm(listinduk L, address P) {
-    address Q = L.first;
-    while (Q != Nil) {
-        if (Q == P) return true;
-        Q = Q->next;
+static bool edgeExists(adrNode from, adrNode to) {
+    for (adrEdge e = from->firstEdge; e != nullptr; e = e->next) {
+        if (e->node == to) return true;
     }
     return false;
 }
 
-boolean fFindElmanak(listanak L, address_anak P) {
-    address_anak Q = L.first;
-    while (Q != Nil) {
-        if (Q == P) return true;
-        Q = Q->next;
-    }
-    return false;
+static void addEdgeOneWay(adrNode from, adrNode to) {
+    if (from == nullptr || to == nullptr) return;
+    if (edgeExists(from, to)) return;
+
+    adrEdge e = newEdge(to);
+
+    e->next = from->firstEdge;
+    from->firstEdge = e;
 }
 
-address findBefore(listinduk L, address P) {
-    if (P == L.first) return Nil;
-    return P->prev;
+void CreateGraph(Graph &G) {
+    G.first = nullptr;
 }
 
-void insertFirst(listinduk &L, address P) {
-    if (ListEmpty(L)) {
-        L.first = P;
-        L.last = P;
+adrNode InsertNode(Graph &G, infoGraph X) {
+    adrNode p = newNode(X);
+
+    if (G.first == nullptr) {
+        G.first = p;
     } else {
-        P->next = L.first;
-        L.first->prev = P;
-        L.first = P;
+        adrNode last = G.first;
+        while (last->next != nullptr) last = last->next;
+        last->next = p;
     }
+
+    return p;
 }
 
-void insertLast(listinduk &L, address P) {
-    if (ListEmpty(L)) {
-        insertFirst(L, P);
-    } else {
-        P->prev = L.last;
-        L.last->next = P;
-        L.last = P;
-    }
+void ConnectNode(Graph &G, adrNode N1, adrNode N2) {
+    if (N1 == nullptr || N2 == nullptr) return;
+    if (N1 == N2) return;
+
+    addEdgeOneWay(N1, N2);
+    addEdgeOneWay(N2, N1);
 }
 
-void insertAfter(listinduk &L, address P, address Prec) {
-    if (Prec == L.last) {
-        insertLast(L, P);
-    } else {
-        P->next = Prec->next;
-        P->prev = Prec;
-        Prec->next->prev = P;
-        Prec->next = P;
-    }
-}
-
-void insertFirstAnak(listanak &L, address_anak P) {
-    if (ListEmptyAnak(L)) {
-        L.first = P;
-        L.last = P;
-    } else {
-        P->next = L.first;
-        L.first->prev = P;
-        L.first = P;
-    }
-}
-
-void insertLastAnak(listanak &L, address_anak P) {
-    if (ListEmptyAnak(L)) {
-        insertFirstAnak(L, P);
-    } else {
-        P->prev = L.last;
-        L.last->next = P;
-        L.last = P;
-    }
-}
-
-void insertAfterAnak(listanak &L, address_anak P, address_anak Prec) {
-    if (Prec == L.last) {
-        insertLastAnak(L, P);
-    } else {
-        P->next = Prec->next;
-        P->prev = Prec;
-        Prec->next->prev = P;
-        Prec->next = P;
-    }
-}
-
-void delFirst(listinduk &L, address &P) {
-    P = L.first;
-    if (L.first == L.last) {
-        L.first = Nil;
-        L.last = Nil;
-    } else {
-        L.first = L.first->next;
-        L.first->prev = Nil;
-        P->next = Nil;
-    }
-}
-
-void delLast(listinduk &L, address &P) {
-    P = L.last;
-    if (L.first == L.last) {
-        delFirst(L, P);
-    } else {
-        L.last = L.last->prev;
-        L.last->next = Nil;
-        P->prev = Nil;
-    }
-}
-
-void delAfter(listinduk &L, address &P, address Prec) {
-    P = Prec->next;
-    if (P == L.last) {
-        delLast(L, P);
-    } else {
-        Prec->next = P->next;
-        P->next->prev = Prec;
-        P->next = Nil;
-        P->prev = Nil;
-    }
-}
-
-void delP(listinduk &L, infotypeinduk X) {
-    address P = findElm(L, X);
-    if (P == Nil) return;
-
-    address Q;
-    if (P == L.first) {
-        delFirst(L, Q);
-    } else if (P == L.last) {
-        delLast(L, Q);
-    } else {
-        delAfter(L, Q, P->prev);
-    }
-    dealokasi(Q);
-}
-
-void delFirstAnak(listanak &L, address_anak &P) {
-    P = L.first;
-    if (L.first == L.last) {
-        L.first = Nil;
-        L.last = Nil;
-    } else {
-        L.first = L.first->next;
-        L.first->prev = Nil;
-        P->next = Nil;
-    }
-}
-
-void delLastAnak(listanak &L, address_anak &P) {
-    P = L.last;
-    if (L.first == L.last) {
-        delFirstAnak(L, P);
-    } else {
-        L.last = L.last->prev;
-        L.last->next = Nil;
-        P->prev = Nil;
-    }
-}
-
-void delAfterAnak(listanak &L, address_anak &P, address_anak Prec) {
-    P = Prec->next;
-    if (P == L.last) {
-        delLastAnak(L, P);
-    } else {
-        Prec->next = P->next;
-        P->next->prev = Prec;
-        P->next = Nil;
-        P->prev = Nil;
-    }
-}
-
-void delPAnak(listanak &L, infotypeanak X) {
-    address_anak P = findElm(L, X);
-    if (P == Nil) return;
-
-    address_anak Q;
-    if (P == L.first) {
-        delFirstAnak(L, Q);
-    } else if (P == L.last) {
-        delLastAnak(L, Q);
-    } else {
-        delAfterAnak(L, Q, P->prev);
-    }
-    dealokasiAnak(Q);
-}
-
-void printInfoInduk(listinduk L) {
-    address P = L.first;
-    while (P != Nil) {
-        cout << "Induk : " << P->info << " | Anak : ";
-        printInfoAnak(P->lanak);
-        cout << endl;
-        P = P->next;
-    }
-}
-
-void printInfoAnak(listanak L) {
-    address_anak P = L.first;
-    while (P != Nil) {
-        cout << P->info << " ";
-        P = P->next;
-    }
-}
-
-int nbListInduk(listinduk L) {
-    int n = 0;
-    address P = L.first;
-    while (P != Nil) {
-        n++;
-        P = P->next;
-    }
-    return n;
-}
-
-int nbListAnak(listanak L) {
-    int n = 0;
-    address_anak P = L.first;
-    while (P != Nil) {
-        n++;
-        P = P->next;
-    }
-    return n;
-}
-
-void delAll(listinduk &L) {
-    address P;
-    while (!ListEmpty(L)) {
-        delFirst(L, P);
-        // hapus semua anak
-        address_anak Q;
-        while (!ListEmptyAnak(P->lanak)) {
-            delFirstAnak(P->lanak, Q);
-            dealokasiAnak(Q);
-        }
-        dealokasi(P);
-    }
+void PrintGraphASCII() {
+    cout << "          A\n";
+    cout << "        /   \\\n";
+    cout << "       B     C\n";
+    cout << "     /  \\   / \\\n";
+    cout << "    D    E F   G\n";
+    cout << "     \\    \\|   /\n";
+    cout << "          H\n\n";
 }
 
 ```
 
-### mainmulti.cpp
+### maingraph1.cpp
 
 ```C++
-#include "multilist.h"
-#include <iostream>
-using namespace std;
+#include "graph1.h"
 
 int main() {
-    listinduk L;
-    CreateList(L);
+    Graph G;
+    CreateGraph(G);
 
-    address P1 = alokasi(10);
-    address P2 = alokasi(20);
-    address P3 = alokasi(30);
+    adrNode A = InsertNode(G, 'A');
+    adrNode B = InsertNode(G, 'B');
+    adrNode C = InsertNode(G, 'C');
+    adrNode D = InsertNode(G, 'D');
+    adrNode E = InsertNode(G, 'E');
+    adrNode F = InsertNode(G, 'F');
+    adrNode Gg = InsertNode(G, 'G');
+    adrNode H = InsertNode(G, 'H');
 
-    insertFirst(L, P1);
-    insertLast(L, P2);
-    insertLast(L, P3);
+    ConnectNode(G, A, B);
+    ConnectNode(G, A, C);
 
-    address_anak A1 = alokasiAnak(100);
-    address_anak A2 = alokasiAnak(200);
+    ConnectNode(G, B, D);
+    ConnectNode(G, B, E);
 
-    insertFirstAnak(P1->lanak, A1);
-    insertLastAnak(P1->lanak, A2);
+    ConnectNode(G, C, F);
+    ConnectNode(G, C, Gg);
 
-    address_anak B1 = alokasiAnak(300);
-    insertFirstAnak(P2->lanak, B1);
+    ConnectNode(G, D, H);
+    ConnectNode(G, E, H);
+    ConnectNode(G, F, H);
+    ConnectNode(G, Gg, H);
 
-    cout << "=== DATA MULTI LIST ===" << endl;
-    printInfoInduk(L);
-
-    cout << "\nCari induk 20: ";
-    address cari = findElm(L, 20);
-    if (cari != Nil) cout << "ketemu (" << cari->info << ")" << endl;
-    else cout << "tidak ketemu" << endl;
-
-    cout << "\nHapus induk 20" << endl;
-    delP(L, 20);
-
-    cout << "\n=== SETELAH HAPUS INDUK 20 ===" << endl;
-    printInfoInduk(L);
-
-    cout << "\nHapus semua" << endl;
-    delAll(L);
-
-    cout << "\nJumlah induk: " << nbListInduk(L) << endl;
+    PrintGraphASCII();
 
     return 0;
 }
 
 ```
 #### Output:
-<img width="1146" height="395" alt="image" src="https://github.com/user-attachments/assets/a9661a02-b338-496b-a716-27c0a96cf451" />
+<img width="639" height="245" alt="image" src="https://github.com/user-attachments/assets/bdc972ce-f92c-4a00-8f26-a77745321221" />
 
-Program ini mengimplementasikan ADT Multi Linked List, yaitu struktur data list induk yang setiap elemen induknya memiliki list anak sendiri. Baik list induk maupun list anak menggunakan doubly linked list (memiliki pointer next dan prev). File multilist.h berisi definisi tipe data (struct) dan prototype fungsi, sedangkan multilist.cpp berisi implementasi fungsi-fungsi seperti pembuatan list, alokasi/dealokasi node, pencarian elemen, penambahan (insert), penghapusan (delete), serta menampilkan isi list.
-
-Pada mainmulti.cpp, program melakukan uji coba dengan:
-
-1. Membuat list induk kosong.
-2. Menambahkan beberapa node induk (misal 10, 20, 30).
-3. Menambahkan node anak ke masing-masing induk.
-4. Menampilkan seluruh data induk beserta anaknya.
-5. Mencari dan menghapus elemen induk tertentu.
-6. Menghapus seluruh elemen list menggunakan delAll.
-
-Dengan program ini, user dapat melihat cara kerja Multi Linked List dalam mengelola data induk–anak secara dinamis.
+Kode ini membangun **ADT Graph tidak berarah (undirected)** memakai **linked list**: `Graph` menyimpan pointer `first` ke daftar node, setiap `ElmNode` menyimpan `info` (huruf A–H), pointer `next` untuk menyambung ke node berikutnya, serta `firstEdge` yang menunjuk ke daftar edge (tetangga) miliknya; sedangkan `ElmEdge` menyimpan pointer `node` (tujuan/tetangga) dan `next` untuk edge berikutnya. `CreateGraph` mengosongkan graph, `InsertNode` membuat node baru dan menambahkannya ke akhir list node, lalu `ConnectNode` menghubungkan dua node dengan menambah edge **dua arah** (karena graph tidak berarah) lewat `addEdgeOneWay` sambil mencegah duplikat menggunakan `edgeExists`. Fungsi `PrintGraphASCII` hanya menampilkan bentuk graf seperti gambar dalam bentuk teks (hardcode), bukan hasil traversal dari struktur graph.
 
 #### Full code Screenshot:
-<img width="1917" height="1139" alt="image" src="https://github.com/user-attachments/assets/9839d870-01b4-4181-994f-78882e7fedd2" />
-<img width="1918" height="1140" alt="image" src="https://github.com/user-attachments/assets/188ff1a0-1772-4157-ac72-8518317627c8" />
-<img width="1919" height="1135" alt="image" src="https://github.com/user-attachments/assets/29e499a1-863f-42ca-9f43-8bf35b8d8d5d" />
+<img width="1617" height="1073" alt="image" src="https://github.com/user-attachments/assets/023074d8-d67b-48be-8456-427b5ac542e6" />
+<img width="1621" height="972" alt="image" src="https://github.com/user-attachments/assets/0a28147e-6569-4fb6-b01b-c2bf3d38ac99" />
+<img width="1620" height="972" alt="image" src="https://github.com/user-attachments/assets/08069c95-20c4-4006-98d7-12a022fd076b" />
 
 
 ### 
-<img width="1018" height="660" alt="image" src="https://github.com/user-attachments/assets/315953e2-7274-41cc-963d-912e52e16575" />
+<img width="919" height="59" alt="image" src="https://github.com/user-attachments/assets/6977a35b-4748-4c85-bd72-9c47f375baef" />
+<img width="861" height="54" alt="image" src="https://github.com/user-attachments/assets/f25198b3-3b5b-421d-bc6a-8211da16f9cf" />
 
-
-### maincircular.cpp
+### graph1.cpp
 ```C++
-#include "circularlist.h"
+#include "graph1.h"
 
-address createData(string nama, string nim, char jenis_kelamin, float ipk) {
-    infotype x;
-    address P;
-    x.nama = nama;
-    x.nim = nim;
-    x.jenis_kelamin = jenis_kelamin;
-    x.ipk = ipk;
-    P = alokasi(x);
-    return P;
+static adrNode newNode(infoGraph x) {
+    adrNode p = new ElmNode;
+    p->info = x;
+    p->visited = 0;
+    p->firstEdge = nullptr;
+    p->next = nullptr;
+    return p;
 }
 
+static adrEdge newEdge(adrNode dest) {
+    adrEdge e = new ElmEdge;
+    e->node = dest;
+    e->next = nullptr;
+    return e;
+}
+
+static bool edgeExists(adrNode from, adrNode to) {
+    for (adrEdge e = from->firstEdge; e != nullptr; e = e->next) {
+        if (e->node == to) return true;
+    }
+    return false;
+}
+
+static void addEdgeOneWay(adrNode from, adrNode to) {
+    if (from == nullptr || to == nullptr) return;
+    if (edgeExists(from, to)) return;
+
+    adrEdge e = newEdge(to);
+
+    e->next = from->firstEdge;
+    from->firstEdge = e;
+}
+
+void CreateGraph(Graph &G) {
+    G.first = nullptr;
+}
+
+adrNode InsertNode(Graph &G, infoGraph X) {
+    adrNode p = newNode(X);
+
+    if (G.first == nullptr) {
+        G.first = p;
+    } else {
+        adrNode last = G.first;
+        while (last->next != nullptr) last = last->next;
+        last->next = p;
+    }
+
+    return p;
+}
+
+void ConnectNode(Graph &G, adrNode N1, adrNode N2) {
+    if (N1 == nullptr || N2 == nullptr) return;
+    if (N1 == N2) return;
+
+    addEdgeOneWay(N1, N2);
+    addEdgeOneWay(N2, N1);
+}
+
+void PrintGraphASCII() {
+    cout << "          A\n";
+    cout << "        /   \\\n";
+    cout << "       B     C\n";
+    cout << "     /  \\   / \\\n";
+    cout << "    D    E F   G\n";
+    cout << "     \\    \\|   /\n";
+    cout << "          H\n\n";
+}
+
+// prosedur DFS
+void PrintDFS(Graph G, adrNode N) {
+    if (N == nullptr) return;
+
+    N->visited = 1;
+    cout << N->info << " ";
+
+    adrEdge e = N->firstEdge;
+    while (e != nullptr) {
+        if (e->node->visited == 0) {
+            PrintDFS(G, e->node);
+        }
+        e = e->next;
+    }
+}
+```
+### maingraph1.cpp
+```C++
+#include "graph1.h"
+
 int main() {
-    List L;
-    address P1 = Nil;
-    address P2 = Nil;
-    infotype x;
+    Graph G;
+    CreateGraph(G);
 
-    createList(L);
+    adrNode A = InsertNode(G, 'A');
+    adrNode B = InsertNode(G, 'B');
+    adrNode C = InsertNode(G, 'C');
+    adrNode D = InsertNode(G, 'D');
+    adrNode E = InsertNode(G, 'E');
+    adrNode F = InsertNode(G, 'F');
+    adrNode Gg = InsertNode(G, 'G');
+    adrNode H = InsertNode(G, 'H');
 
-    cout << "coba insert first, last, dan after" << endl;
+    ConnectNode(G, A, B);
+    ConnectNode(G, A, C);
 
-    P1 = createData("Danu", "04", 'l', 4.0);
-    insertFirst(L, P1);
+    ConnectNode(G, B, D);
+    ConnectNode(G, B, E);
 
-    P1 = createData("Fahmi", "06", 'l', 3.45);
-    insertLast(L, P1);
+    ConnectNode(G, C, F);
+    ConnectNode(G, C, Gg);
 
-    P1 = createData("Bobi", "02", 'l', 3.71);
-    insertFirst(L, P1);
+    ConnectNode(G, D, H);
+    ConnectNode(G, E, H);
+    ConnectNode(G, F, H);
+    ConnectNode(G, Gg, H);
 
-    P1 = createData("Ali", "01", 'l', 3.3);
-    insertFirst(L, P1);
+    //dfs
 
-    P1 = createData("Gita", "07", 'p', 3.75);
-    insertLast(L, P1);
+    for (adrNode p = G.first; p != nullptr; p = p->next) {
+        p->visited = 0;
+    }
 
-    x.nim = "07";
-    P1 = findElm(L, x);
-    P2 = createData("Cindi", "03", 'p', 3.5);
-    insertAfter(L, P1, P2);
-
-    x.nim = "02";
-    P1 = findElm(L, x);
-    P2 = createData("Hilmi", "08", 'p', 3.3);
-    insertAfter(L, P1, P2);
-
-    x.nim = "04";
-    P1 = findElm(L, x);
-    P2 = createData("Eli", "05", 'p', 3.4);
-    insertAfter(L, P1, P2);
-
-    printInfo(L);
+    cout << "Hasil DFS: ";
+    PrintDFS(G, A);
+    cout << endl;
 
     return 0;
 }
-
-
 ```
-### circularlist.cpp
+### graph1.h
 ```C++
-#include "circularlist.h"
-
-void createList(List &L) {
-    L.first = Nil;
-}
-
-address alokasi(infotype x) {
-    address P = new ElmList;
-    P->info = x;
-    P->next = Nil;
-    P->prev = Nil;
-    return P;
-}
-
-void dealokasi(address &P) {
-    delete P;
-    P = Nil;
-}
-
-void insertFirst(List &L, address P) {
-    if (L.first == Nil) {
-        L.first = P;
-        P->next = P;
-        P->prev = P;
-    } else {
-        address last = L.first->prev;
-
-        P->next = L.first;
-        P->prev = last;
-
-        last->next = P;
-        L.first->prev = P;
-        L.first = P;
-    }
-}
-
-void insertLast(List &L, address P) {
-    if (L.first == Nil) {
-        insertFirst(L, P);
-    } else {
-        address last = L.first->prev;
-
-        P->next = L.first;
-        P->prev = last;
-
-        last->next = P;
-        L.first->prev = P;
-    }
-}
-
-void insertAfter(List &L, address Prec, address P) {
-    if (Prec != Nil) {
-        address nextNode = Prec->next;
-
-        P->next = nextNode;
-        P->prev = Prec;
-
-        Prec->next = P;
-        nextNode->prev = P;
-    }
-}
-
-void deleteFirst(List &L, address &P) {
-    if (L.first == Nil) {
-        P = Nil;
-    } else if (L.first->next == L.first) {
-        P = L.first;
-        L.first = Nil;
-        P->next = Nil;
-        P->prev = Nil;
-    } else {
-        address last = L.first->prev;
-
-        P = L.first;
-        L.first = L.first->next;
-
-        L.first->prev = last;
-        last->next = L.first;
-
-        P->next = Nil;
-        P->prev = Nil;
-    }
-}
-
-void deleteLast(List &L, address &P) {
-    if (L.first == Nil) {
-        P = Nil;
-    } else if (L.first->next == L.first) {
-        deleteFirst(L, P);
-    } else {
-        address last = L.first->prev;
-        address beforeLast = last->prev;
-
-        P = last;
-        beforeLast->next = L.first;
-        L.first->prev = beforeLast;
-
-        P->next = Nil;
-        P->prev = Nil;
-    }
-}
-
-void deleteAfter(List &L, address Prec, address &P) {
-    if (Prec != Nil && L.first != Nil) {
-        P = Prec->next;
-
-        if (P == L.first) { // kalau yang dihapus adalah first
-            deleteFirst(L, P);
-        } else {
-            address nextNode = P->next;
-            Prec->next = nextNode;
-            nextNode->prev = Prec;
-
-            P->next = Nil;
-            P->prev = Nil;
-        }
-    } else {
-        P = Nil;
-    }
-}
-
-address findElm(List L, infotype x) {
-    if (L.first == Nil) return Nil;
-
-    address P = L.first;
-    do {
-        if (P->info.nim == x.nim) {
-            return P;
-        }
-        P = P->next;
-    } while (P != L.first);
-
-    return Nil;
-}
-
-void printInfo(List L) {
-    if (L.first == Nil) {
-        cout << "List kosong." << endl;
-    } else {
-        address P = L.first;
-        do {
-            cout << "Nama : " << P->info.nama << endl;
-            cout << "NIM  : " << P->info.nim << endl;
-            cout << "L/P  : " << P->info.jenis_kelamin << endl;
-            cout << "IPK  : " << P->info.ipk << endl;
-            cout << "---------------------" << endl;
-            P = P->next;
-        } while (P != L.first);
-    }
-}
-
-```
-### circularlist.h
-```C++
-#ifndef CIRCULARLIST_H_INCLUDED
-#define CIRCULARLIST_H_INCLUDED
+#ifndef GRAPH1_H
+#define GRAPH1_H
 
 #include <iostream>
-#include <string>
 using namespace std;
 
-#define Nil NULL
+typedef char infoGraph;
 
-typedef struct mahasiswa infotype;
-typedef struct ElmList *address;
+struct ElmNode;
+struct ElmEdge;
 
-struct mahasiswa {
-    string nama;
-    string nim;
-    char jenis_kelamin;
-    float ipk;
+typedef ElmNode* adrNode;
+typedef ElmEdge* adrEdge;
+
+struct ElmEdge {
+    adrNode node;
+    adrEdge next;
 };
 
-struct ElmList {
-    infotype info;
-    address next;
-    address prev;
+struct ElmNode {
+    infoGraph info;
+    int visited;
+    adrEdge firstEdge;
+    adrNode next;
 };
 
-struct List {
-    address first;
+struct Graph {
+    adrNode first;
 };
 
-void createList(List &L);
-address alokasi(infotype x);
-void dealokasi(address &P);
+void CreateGraph(Graph &G);
+adrNode InsertNode(Graph &G, infoGraph X);
+void ConnectNode(Graph &G, adrNode N1, adrNode N2);
 
-void insertFirst(List &L, address P);
-void insertAfter(List &L, address Prec, address P);
-void insertLast(List &L, address P);
+void PrintGraphASCII();
+void PrintDFS(Graph G, adrNode N);//ditambah
 
-void deleteFirst(List &L, address &P);
-void deleteAfter(List &L, address Prec, address &P);
-void deleteLast(List &L, address &P);
-
-address findElm(List L, infotype x);   // cari berdasarkan nim
-void printInfo(List L);
 
 #endif
 
 ```
 #### Output:
-<img width="844" height="284" alt="image" src="https://github.com/user-attachments/assets/d89178a3-ed06-4e44-9acd-7aa6c5a4ec90" />
+<img width="632" height="160" alt="image" src="https://github.com/user-attachments/assets/c3a640eb-a846-42c8-bda3-b057d3c9bae4" />
 
-Program ini digunakan untuk menyimpan dan mengelola data mahasiswa (nama, NIM, jenis kelamin, IPK) menggunakan Circular Doubly Linked List, sehingga data bisa ditambah, dicari (berdasarkan NIM), dihapus, dan ditampilkan.
+Program ini digunakan untuk **membuat dan merepresentasikan graph tidak berarah** serta **menelusurinya menggunakan DFS (Depth First Search)**, yaitu mengunjungi setiap simpul dari satu simpul awal dengan cara masuk sedalam mungkin ke cabang sebelum pindah ke cabang lain.
 
 #### Full code Screenshot:
-<img width="1919" height="1140" alt="image" src="https://github.com/user-attachments/assets/721ceb7b-ae68-4436-aa23-1b4a03000fd6" />
-<img width="1919" height="1138" alt="image" src="https://github.com/user-attachments/assets/4ab49128-211e-40dd-bb20-d19425bae313" />
-<img width="1919" height="1140" alt="image" src="https://github.com/user-attachments/assets/58a8b664-bbc7-4f18-a75a-123f0e0033b6" />
+<img width="1617" height="1064" alt="image" src="https://github.com/user-attachments/assets/e01b956b-d33c-4994-8f9e-43a18323301f" />
+<img width="1604" height="1072" alt="image" src="https://github.com/user-attachments/assets/4b7b856f-eb85-41a4-a91e-7d2bab15c287" />
+<img width="1620" height="1070" alt="image" src="https://github.com/user-attachments/assets/a1bc1bf8-060c-45f5-94a7-26b049ba8e1c" />
 
+####
+### 
+<img width="656" height="95" alt="image" src="https://github.com/user-attachments/assets/87819ace-79d7-4992-887b-008d54667fac" />
+
+### graph1.cpp
+```C++
+#include "graph1.h"
+#include <queue> 
+
+void PrintBFS(Graph G, adrNode N) {
+    if (N == nullptr) return;
+
+    // reset visited
+    for (adrNode p = G.first; p != nullptr; p = p->next) {
+        p->visited = 0;
+    }
+
+    queue<adrNode> q;
+
+    N->visited = 1;
+    q.push(N);
+
+    while (!q.empty()) {
+        adrNode cur = q.front();
+        q.pop();
+
+        cout << cur->info << " ";
+
+        adrEdge e = cur->firstEdge;
+        while (e != nullptr) {
+            if (e->node->visited == 0) {
+                e->node->visited = 1;
+                q.push(e->node);
+            }
+            e = e->next;
+        }
+    }
+}
+
+static adrNode newNode(infoGraph x) {
+    adrNode p = new ElmNode;
+    p->info = x;
+    p->visited = 0;
+    p->firstEdge = nullptr;
+    p->next = nullptr;
+    return p;
+}
+
+static adrEdge newEdge(adrNode dest) {
+    adrEdge e = new ElmEdge;
+    e->node = dest;
+    e->next = nullptr;
+    return e;
+}
+
+static bool edgeExists(adrNode from, adrNode to) {
+    for (adrEdge e = from->firstEdge; e != nullptr; e = e->next) {
+        if (e->node == to) return true;
+    }
+    return false;
+}
+
+static void addEdgeOneWay(adrNode from, adrNode to) {
+    if (from == nullptr || to == nullptr) return;
+    if (edgeExists(from, to)) return;
+
+    adrEdge e = newEdge(to);
+
+    e->next = from->firstEdge;
+    from->firstEdge = e;
+}
+
+void CreateGraph(Graph &G) {
+    G.first = nullptr;
+}
+
+adrNode InsertNode(Graph &G, infoGraph X) {
+    adrNode p = newNode(X);
+
+    if (G.first == nullptr) {
+        G.first = p;
+    } else {
+        adrNode last = G.first;
+        while (last->next != nullptr) last = last->next;
+        last->next = p;
+    }
+
+    return p;
+}
+
+void ConnectNode(Graph &G, adrNode N1, adrNode N2) {
+    if (N1 == nullptr || N2 == nullptr) return;
+    if (N1 == N2) return;
+
+    addEdgeOneWay(N1, N2);
+    addEdgeOneWay(N2, N1);
+}
+
+void PrintGraphASCII() {
+    cout << "          A\n";
+    cout << "        /   \\\n";
+    cout << "       B     C\n";
+    cout << "     /  \\   / \\\n";
+    cout << "    D    E F   G\n";
+    cout << "     \\    \\|   /\n";
+    cout << "          H\n\n";
+}
+
+// prosedur DFS
+void PrintDFS(Graph G, adrNode N) {
+    if (N == nullptr) return;
+
+    N->visited = 1;
+    cout << N->info << " ";
+
+    adrEdge e = N->firstEdge;
+    while (e != nullptr) {
+        if (e->node->visited == 0) {
+            PrintDFS(G, e->node);
+        }
+        e = e->next;
+    }
+}
+
+```
+### maingraph1.cpp
+```C++
+#include "graph1.h"
+
+int main() {
+    Graph G;
+    CreateGraph(G);
+
+    adrNode A = InsertNode(G, 'A');
+    adrNode B = InsertNode(G, 'B');
+    adrNode C = InsertNode(G, 'C');
+    adrNode D = InsertNode(G, 'D');
+    adrNode E = InsertNode(G, 'E');
+    adrNode F = InsertNode(G, 'F');
+    adrNode Gg = InsertNode(G, 'G');
+    adrNode H = InsertNode(G, 'H');
+
+    ConnectNode(G, A, B);
+    ConnectNode(G, A, C);
+
+    ConnectNode(G, B, D);
+    ConnectNode(G, B, E);
+
+    ConnectNode(G, C, F);
+    ConnectNode(G, C, Gg);
+
+    ConnectNode(G, D, H);
+    ConnectNode(G, E, H);
+    ConnectNode(G, F, H);
+    ConnectNode(G, Gg, H);
+
+    //dfs
+
+    for (adrNode p = G.first; p != nullptr; p = p->next) {
+        p->visited = 0;
+    }
+
+    cout << "Hasil DFS: ";
+    PrintDFS(G, A);
+    cout << endl;
+
+    cout << "Hasil BFS: "; //tambahkan untuk hasil BFS
+    PrintBFS(G, A);
+    cout << endl;
+
+
+    return 0;
+}
+```
+### graph1.h
+```C++
+#ifndef GRAPH1_H
+#define GRAPH1_H
+
+#include <iostream>
+using namespace std;
+
+typedef char infoGraph;
+
+struct ElmNode;
+struct ElmEdge;
+
+typedef ElmNode* adrNode;
+typedef ElmEdge* adrEdge;
+
+struct ElmEdge {
+    adrNode node;
+    adrEdge next;
+};
+
+struct ElmNode {
+    infoGraph info;
+    int visited;
+    adrEdge firstEdge;
+    adrNode next;
+};
+
+struct Graph {
+    adrNode first;
+};
+
+void CreateGraph(Graph &G);
+adrNode InsertNode(Graph &G, infoGraph X);
+void ConnectNode(Graph &G, adrNode N1, adrNode N2);
+
+void PrintGraphASCII();
+void PrintDFS(Graph G, adrNode N);//ditambah
+void PrintBFS(Graph G, adrNode N); //ditambah bfs
+
+
+#endif
+
+```
+#### Output:
+<img width="412" height="129" alt="image" src="https://github.com/user-attachments/assets/0423b97c-5c5d-439f-8063-56f715d69a82" />
+Program ini menjelaskan tentang struktur data Graph (graf) tidak berarah dan cara menelusuri graf menggunakan algoritma BFS (Breadth First Search) (dan bisa juga DFS), yaitu mengunjungi simpul-simpul graf dari satu simpul awal berdasarkan tetangga terdekat dulu (per level).
+
+#### Full code Screenshot:
+<img width="1623" height="1071" alt="image" src="https://github.com/user-attachments/assets/8291b1d5-3f69-497c-82ca-37969693b107" />
+<img width="1619" height="1095" alt="image" src="https://github.com/user-attachments/assets/d6fe7c33-ada7-45d1-89f5-cec2ec2389b6" />
+<img width="1626" height="1059" alt="image" src="https://github.com/user-attachments/assets/8af951dc-6931-4e5e-ad63-13d0f4cc5256" />
 
 ####
 
 ## Kesimpulan
 
-Seluruh modul pada mata kuliah Struktur Data membahas berbagai ADT (Abstract Data Type) dan cara implementasinya menggunakan bahasa C++. Dimulai dari struktur data dasar seperti linked list, kemudian berkembang ke struktur yang lebih kompleks seperti multi linked list, circular list, graph, serta traversal seperti BFS dan DFS. Setiap modul melatih kemampuan membuat header (.h) untuk definisi struktur & prototype fungsi, lalu membuat source (.cpp) untuk implementasi, dan main.cpp untuk pengujian. Dengan mempelajari semua modul ini, mahasiswa memahami cara menyimpan, mengelola, menambah, mencari, dan menghapus data secara dinamis menggunakan pointer.
+graph adalah struktur data yang terdiri dari simpul (node) dan sisi (edge) untuk merepresentasikan hubungan antar objek. Graph sangat berguna untuk memodelkan dan menyelesaikan berbagai masalah nyata seperti pencarian rute/jalur, analisis jaringan, dan optimisasi, karena mampu menggambarkan koneksi yang kompleks. Graph juga memiliki beberapa jenis (directed, undirected, weighted, unweighted) yang dipakai sesuai kebutuhan, sehingga penerapannya luas dalam kehidupan sehari-hari seperti peta, media sosial, rekomendasi, transportasi, dan sistem informasi.
 
 ## Referensi
-MODUL 13 MULTI LINKED LIST
+MODUL 14 GRAPH, https://fikti.umsu.ac.id/graph-pengertian-fungsi-dan-jenisnya/
